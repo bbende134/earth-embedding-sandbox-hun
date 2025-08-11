@@ -1,0 +1,99 @@
+[project]
+name = "embeddings-explorer-sandbox"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "xee",
+    "zarr<3.0", # pin zarr < 3 for consolidation ?
+    "absl-py",
+    "apache-beam[gcp]",
+    "xarray-beam",
+    "cloudpathlib[gs]",
+    "gcsfs",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=4.1.0",
+    "pre-commit-uv>=4.1.4",
+    "pytest>=8.3.4",
+]
+
+[tool.setuptools.packages.find]
+namespaces = true
+
+
+[tool.ruff]
+target-version = "py312"
+fix = true
+line-length = 100
+
+[tool.ruff.lint]
+# B: flake8-bugbear rules (catches likely bugs and design problems)
+# A: flake8-builtins rules (checks for python builtins being used as variables)
+# C4: flake8-comprehensions (helps write better list/set/dict comprehensions)
+# PIE: flake8-pie rules (misc. linting rules)
+# PL: pylint rules (general Python coding standards)
+# RUF: Ruff-specific rules
+# SIM: flake8-simplify (helps simplify code)
+# TCH: flake8-type-checking (type checking related rules)
+# UP: pyupgrade rules (upgrades syntax for newer Python versions)
+
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "N",
+    "B",
+    "A",
+    "C4",
+    "PIE",
+    "PL",
+    "RUF",
+    "SIM",
+    "TCH",
+    "UP",
+]
+
+# Ignore these Ruff linter rules
+ignore = [
+    "B904", # Ignore B904 (raise-without-from-within-except)
+    "TC001", # Ignoring since we do not use type checking blocks currently
+    # Ignoring since we need to use Depends(BearerExtractValidate()) in all route
+    # parameters for FastAPI
+    "B008",
+]
+
+[tool.ruff.lint.flake8-bugbear]
+# Ignore B008 (function-call-in-default-argument) for FastAPI dependency injection
+# Allow default arguments like, e.g., `data: List[str] = fastapi.Query(None)`.
+# see more: https://docs.astral.sh/ruff/settings/#lint_flake8-bugbear_extend-immutable-calls
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+]
+
+[tool.ruff.lint.flake8-type-checking]
+# Exempt certain classes from TC001 (too-many-union-combinations)
+# see more: https://docs.astral.sh/ruff/settings/#lint_flake8-type-checking_runtime-evaluated-base-classes
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "sqlalchemy.orm.DeclarativeBase",
+    "sqlalchemy.orm.decl_api.DeclarativeBase",
+]
+
+[tool.ruff.lint.flake8-builtins]
+builtins-allowed-modules = ["logging"]
+
+#PyTest Config
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+markers = [
+    "interactive: marks tests as requiring manual/interactive execution"
+]
