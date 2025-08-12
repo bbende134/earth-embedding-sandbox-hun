@@ -89,7 +89,7 @@ def clean_and_parse_utm_zone(espg_str: str) -> str:
     zone = parts[1][-2:]
     if int(zone) < 1 or int(zone) > 60:
         raise ValueError("UTM zone number must be between 01 and 60")
-    return {"6": "N", "7": "S"}[hemisphere] + zone  # e.g. "30N" or "30S"
+    return zone + {"6": "N", "7": "S"}[hemisphere]  # e.g. "30N" or "30S"
 
 
 def main(argv: list[str]) -> None:
@@ -102,6 +102,7 @@ def main(argv: list[str]) -> None:
         bands = ALL_BANDS
     else:
         bands = [b.strip() for b in custom_options.bands.split(",")]
+    print("bands:", bands)
 
     # parse the utm zone
     assert custom_options.utm_zone.startswith("EPSG"), (
@@ -156,6 +157,7 @@ def main(argv: list[str]) -> None:
         .mosaic()
         .clip(aoi_ee)
     )
+    print(im_float.getInfo())
 
     # Optionally quantize according to the original paper https://arxiv.org/pdf/2507.22291
     # im_quantized = (
