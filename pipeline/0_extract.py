@@ -2,9 +2,9 @@
 # This script extracts Earth Engine data and saves it to a Zarr archive.
 # It loads an xarray dataset backed by Earth Engine, and extracts the pixel values using the ee backend
 # the chunks are then saved to a zarr archive.
-# 
+#
 # Notes on tuning:
-# - Apache beam seems to have quite a high cpu overhead, but the ee concurrency can't exceed 20 concurrent 
+# - Apache beam seems to have quite a high cpu overhead, but the ee concurrency can't exceed 20 concurrent
 #   requests (latency seems to be abour 1s per request)
 # - So we have a problem where we need more cpu, but the pipeline will greedily make more calls to ee.
 # - A good solution seemed to be to use a single thread per worker, and then tune the number of workers.
@@ -12,37 +12,34 @@
 # - so a better solution seems to be limiting the total job size, so batches are smaller, and flow properly through the pipeline
 
 
+import itertools
 import json
 import logging
-import time
 import os
-import itertools
-from typing import AbstractSet, Iterator, Mapping, Optional, Sequence
-from math import ceil
+from collections.abc import Iterator, Mapping, Sequence
+from typing import AbstractSet
 
 # from absl import flags
 import apache_beam as beam
-from apache_beam import pvalue
-from shapely import geometry
 import ee
-from zarr.errors import GroupNotFoundError
 import pyproj
 import xarray as xr
 import xarray_beam as xbeam
-from xarray_beam._src import core as xbeam_core
-from xarray_beam._src.core import Key
 from apache_beam.options.pipeline_options import PipelineOptions
 from cloudpathlib import GSPath
+from shapely import geometry
 from shapely.geometry import shape
 from shapely.ops import transform
-from xee import EarthEngineBackendEntrypoint
+from xarray_beam._src import core as xbeam_core
 from xarray_beam._src import threadmap
+from xarray_beam._src.core import Key
+from xee import EarthEngineBackendEntrypoint
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 ALL_BANDS = [f"A{i:02d}" for i in range(64)]
-RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024} # this makes nice 10km/4mb chunks
+RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024}  # this makes nice 10km/4mb chunks
 
 
 class CustomOptions(PipelineOptions):
@@ -75,6 +72,7 @@ class CustomOptions(PipelineOptions):
         )
         parser.add_argument("--raw_archive", type=str, required=True, help="The output zarr path.")
 
+
 def clean_and_parse_utm_zone(espg_str: str) -> str:
     """Clean and parse the EPSG string for UTM zone."""
     if not espg_str.startswith("EPSG:"):
@@ -83,16 +81,18 @@ def clean_and_parse_utm_zone(espg_str: str) -> str:
     if len(parts) != 2 or not parts[1].isdigit():
         raise ValueError("UTM zone must be in the format 'EPSG:32XYY'")
     assert len(parts[1]) == 5, "UTM zone must be 5 characters long"
-    hemisphere = parts[1][0]
-    if hemisphere not in ['6', '7']:
-        raise ValueError("UTM zone hemisphere must be '6' for North or '7' for South")
+    hemisphere = parts[1][2]
+    if hemisphere not in ["6", "7"]:
+        raise ValueError(
+            f"UTM zone hemisphere ({hemisphere}) must be '6' for North or '7' for South"
+        )
     zone = parts[1][-2:]
     if int(zone) < 1 or int(zone) > 60:
         raise ValueError("UTM zone number must be between 01 and 60")
-    return {"6": "N", "7": "S"}[hemisphere] + zone # e.g. "30N" or "30S"
+    return {"6": "N", "7": "S"}[hemisphere] + zone  # e.g. "30N" or "30S"
+
 
 def main(argv: list[str]) -> None:
-
     # ### Apache Beam Pipeline Setup ###
     options = PipelineOptions()
     main_options = options.get_all_options()
@@ -104,7 +104,9 @@ def main(argv: list[str]) -> None:
         bands = [b.strip() for b in custom_options.bands.split(",")]
 
     # parse the utm zone
-    assert custom_options.utm_zone.startswith("EPSG"), "specify your utm zone as EPSG:32XYY, where X is 6 for N, 7 for S, and YY is the zone number."
+    assert custom_options.utm_zone.startswith("EPSG"), (
+        "specify your utm zone as EPSG:32XYY, where X is 6 for N, 7 for S, and YY is the zone number."
+    )
 
     # ### Earth Engine Initialization ###
     credentials = ee.ServiceAccountCredentials(
@@ -113,7 +115,7 @@ def main(argv: list[str]) -> None:
 
     ee.Initialize(
         credentials=credentials,
-        project=main_options['project'],
+        project=main_options["project"],
         url=os.environ.get("HV_URL", "https://earthengine-highvolume.googleapis.com"),
     )
 
@@ -125,12 +127,14 @@ def main(argv: list[str]) -> None:
     utm_abbrev = clean_and_parse_utm_zone(custom_options.utm_zone)
 
     # reproject the AOI to UTM
-    reproject = pyproj.Transformer.from_crs("EPSG:4326", custom_options.utm_zone, always_xy=True).transform
+    reproject = pyproj.Transformer.from_crs(
+        "EPSG:4326", custom_options.utm_zone, always_xy=True
+    ).transform
     aoi_utm = transform(reproject, aoi)
     minx, _miny, _maxx, maxy = aoi_utm.bounds
 
     aoi_ee = ee.Geometry(aoi.__geo_interface__)
-    
+
     # Set desired pixel size
     scale = int(custom_options.scale)
 
@@ -153,14 +157,13 @@ def main(argv: list[str]) -> None:
         .clip(aoi_ee)
     )
 
-
     # Optionally quantize according to the original paper https://arxiv.org/pdf/2507.22291
     # im_quantized = (
     #     im_float
     #     .abs()
     #     .pow(ee.Image.constant(0.5))
     #     .multiply(im_float.signum())
-    #     .multiply(ee.Image.constant(127)) # [-128, 127] 
+    #     .multiply(ee.Image.constant(127)) # [-128, 127]
     #     .clamp(-127, 127)
     #     .int8()  # Convert to int8
     # )
@@ -178,24 +181,21 @@ def main(argv: list[str]) -> None:
         chunks=RAW_CHUNKS,
         ee_init_if_necessary=True,
         ee_init_kwargs={
-            "project": main_options['project'],
+            "project": main_options["project"],
             "url": os.environ.get("HV_URL", "https://earthengine-highvolume.googleapis.com"),
         },
         executor_kwargs={
-            "max_workers": main_options['ee_max_num_workers'],
+            "max_workers": main_options["ee_max_num_workers"],
         },
         getitem_kwargs={
-            "max_retries":10,
-            "initial_delay": 1000, # increase the delay before retrying
-        }
+            "max_retries": 10,
+            "initial_delay": 1000,  # increase the delay before retrying
+        },
     )
-
-    
-
 
     def iter_chunk_keys(
         offsets: Mapping[str, Sequence[int]],
-        vars: Optional[AbstractSet[str]] = None,  # pylint: disable=redefined-builtin
+        vars: AbstractSet[str] | None = None,  # pylint: disable=redefined-builtin
         chunks=RAW_CHUNKS,
     ) -> Iterator[Key]:
         """A shim overwrite to obtain chunks that intersect with the area of interest."""
@@ -203,19 +203,17 @@ def main(argv: list[str]) -> None:
         count_skipped_aois = 0
         for indices in itertools.product(*chunk_indices):
             key_offsets = {
-                dim: offsets[dim][index] for dim, index in zip(offsets, indices)
+                dim: offsets[dim][index] for dim, index in zip(offsets, indices, strict=False)
             }
             # check intersection of bbox with the area of interest
             query_shp = geometry.box(
-                    ds.X[key_offsets["X"]],
-                    ds.Y[key_offsets["Y"]],
-                    ds.X[min(key_offsets["X"] + chunks["X"]-1, ds.sizes["X"]-1)],
-                    ds.Y[min(key_offsets["Y"] + chunks["Y"]-1, ds.sizes["Y"]-1)],
-                )
-            
-            if aoi_utm.intersects(
-                query_shp
-            ):
+                ds.X[key_offsets["X"]],
+                ds.Y[key_offsets["Y"]],
+                ds.X[min(key_offsets["X"] + chunks["X"] - 1, ds.sizes["X"] - 1)],
+                ds.Y[min(key_offsets["Y"] + chunks["Y"] - 1, ds.sizes["Y"] - 1)],
+            )
+
+            if aoi_utm.intersects(query_shp):
                 if vars is None:
                     yield Key(key_offsets)
                 else:
@@ -223,15 +221,16 @@ def main(argv: list[str]) -> None:
             else:
                 count_skipped_aois += 1
                 if count_skipped_aois % 100 == 0:
-                    print(f"Skipped {count_skipped_aois} AOIs that do not intersect with the area of interest.")
+                    print(
+                        f"Skipped {count_skipped_aois} AOIs that do not intersect with the area of interest."
+                    )
                 continue
 
-
     class ShimDatasetToChunks(xbeam_core.DatasetToChunks):
-        """ This shim around DatasetToChunks:
-           - we force all keys to be iterated locally, rather than in a beam worker.
-           - this allows us to check the intersection of our key bounds with the area of interest,
-            so we can skip keys that do not intersect.
+        """This shim around DatasetToChunks:
+        - we force all keys to be iterated locally, rather than in a beam worker.
+        - this allows us to check the intersection of our key bounds with the area of interest,
+         so we can skip keys that do not intersect.
         """
 
         def _iter_all_keys(self) -> Iterator[Key]:
@@ -240,14 +239,12 @@ def main(argv: list[str]) -> None:
                 yield from iter_chunk_keys(self.offsets)
             else:
                 for name, variable in self._first.items():
-                    relevant_offsets = {
-                        k: v for k, v in self.offsets.items() if k in variable.dims
-                    }
-                    yield from iter_chunk_keys(relevant_offsets, vars={name})  # pytype: disable=wrong-arg-types  # always-use-property-annotation
-
+                    relevant_offsets = {k: v for k, v in self.offsets.items() if k in variable.dims}
+                    yield from iter_chunk_keys(
+                        relevant_offsets, vars={name}
+                    )  # pytype: disable=wrong-arg-types  # always-use-property-annotation
 
         def expand(self, pcoll):
-
             key_pcoll = pcoll | beam.Create(self._iter_all_keys())
 
             return key_pcoll | "KeyToChunks" >> threadmap.FlatThreadMap(
@@ -256,15 +253,14 @@ def main(argv: list[str]) -> None:
 
     template = xbeam.make_template(ds)
 
-
-    print ('~~~~ ds ~~~~')
+    print("~~~~ ds ~~~~")
     print(ds)
-    print ('~~~~ template ~~~~')
+    print("~~~~ template ~~~~")
     print(template)
 
     with beam.Pipeline(options=options) as root:
         _ = (
-            root 
+            root
             # First pull in the dataset and write it to chunks
             | ShimDatasetToChunks(
                 ds,
@@ -278,7 +274,7 @@ def main(argv: list[str]) -> None:
             )
         )
 
-            
+
 if __name__ == "__main__":
     import sys
 

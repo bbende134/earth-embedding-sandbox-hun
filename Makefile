@@ -52,6 +52,7 @@ extract-dataflow-bandwise:
 			--project $${GCP_PROJECT_ID} \
 			--scale $${scale} \
 			--bands $${band_set} \
+			--utm_zone $${utm_zone} \
 			--max_num_workers $${df_max_num_workers} \
 			--ee_max_num_workers $${ee_max_num_workers} \
 			--service_account_email $${SERVICE_ACCOUNT_EMAIL} \
