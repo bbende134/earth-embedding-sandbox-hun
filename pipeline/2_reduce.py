@@ -1,23 +1,16 @@
-"""Mean-reduce the dataset to 64x64 pixels"""
+# ~~~~~~~~ REDUCE PIPELINE ~~~~~~~~
+# This pipeline reduces the consolidated dataset into pyramided meanpool zoom levels.
+# These pyramided zoom levels are used based on the size of the query dataset.
 
-import json
 import logging
-import os
 
-# from absl import flags
-import dataclasses
 import numpy as np
 import apache_beam as beam
-import ee
-import pyproj
 import xarray as xr
 import xarray_beam as xbeam
 from xarray_beam._src import core as xbeam_core
 from apache_beam.options.pipeline_options import PipelineOptions
-from cloudpathlib import GSPath
-from shapely.geometry import shape
-from shapely.ops import transform
-from xee import EarthEngineBackendEntrypoint
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -27,6 +20,7 @@ RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024}
 RAW_CHUNKS_WITH_FEATURES = {"features": 1, "time": 1, "X": 1024, "Y": 1024}
 STACKED_CHUNKS = {"features": -1, "time": 1, "X": 1024, "Y": 1024}
 FINAL_CHUNKS = {"features": -1, "time": 1, "X": 64, "Y": 64}
+ZOOM_BLOCKS = [8,16,32,64,128,256]
 ITEMSIZE = 4 # 1 variable x 4 bytes (float32)
 
 class BlockMean(beam.PTransform):
@@ -67,7 +61,7 @@ class BlockMean(beam.PTransform):
             )
         )
 
-ZOOM_BLOCKS = [8,16,32,64,128,256]
+
 
 class CustomOptions(PipelineOptions):
     @classmethod
@@ -90,11 +84,11 @@ def main(argv: list[str]) -> None:
     templates = {"z8": xbeam.make_template(ds_on_disk)}
 
     for zoom_block in ZOOM_BLOCKS[1:]:
-        templates[f"z{zoom_block}"] = templates[f"z8"].coarsen(X=int(zoom_block/8),Y=int(zoom_block/8), boundary="pad").mean(skipna=True)
-
-
-    # itemsize: i.e. sum([as_bytes(var.dtype) for var in ds])
-    itemsize = 4 # one variable (embeddings) with int8 dtype
+        templates[f"z{zoom_block}"] = (
+            templates[f"z8"]
+            .coarsen(X=int(zoom_block/8),Y=int(zoom_block/8), boundary="pad")
+            .mean(skipna=True)
+        )
 
     print ('~~~~ ds_on_disk~~~')
     print (ds_on_disk)

@@ -1,41 +1,22 @@
-# Copyright 2024 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-r"""Exports EE ImageCollections to Zarr using Xarray-Beam."""
+# ~~~~~~~~ CONSOLIDATE PIPELINE ~~~~~~~~
+# This pipeline consolidates the raw band data into a cohesive dataset and passes the first block-reduce step.
+# If the pipeline is consolidating multiple archives, it can be called with comma-separated --raw_archives.
+# Otherwise it will use a single archive specified by --raw_archive.
+# If consolidating multiple archives, you can also just merge them to a single dataset first by using the --merge-only flag.
 
-import json
+
 import logging
-import os
 
-# from absl import flags
 import apache_beam as beam
-import ee
-import pyproj
 import xarray as xr
 import xarray_beam as xbeam
 from xarray_beam._src import core as xbeam_core
 from apache_beam.options.pipeline_options import PipelineOptions
-from cloudpathlib import GSPath
-from shapely.geometry import shape
-from shapely.ops import transform
-from xee import EarthEngineBackendEntrypoint
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-ALL_BANDS = [f"A{i:02d}" for i in range(64)]
 RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024}
 RAW_CHUNKS_WITH_FEATURES = {"features": 1, "time": 1, "X": 1024, "Y": 1024}
 STACKED_CHUNKS = {"features": -1, "time": 1, "X": 1024, "Y": 1024}
@@ -84,8 +65,11 @@ class BlockMean(beam.PTransform):
 class CustomOptions(PipelineOptions):
     @classmethod
     def _add_argparse_args(cls, parser):
-        parser.add_argument("--raw_archive", type=str, required=True, help="The output zarr path.")
-        parser.add_argument("--reduced_archive", type=str, required=True, help="The output consolidated zarr path.")
+        parser.add_argument("--raw_archive", type=str, help="The input zarr path.")
+        parser.add_argument("--raw_archives", type=str, help="The input zarr paths for multiple archives.")
+        parser.add_argument("--intermediate_archive", type=str, required=True, help="The output consolidated zarr path.")
+        parser.add_argument("--reduced_archive", type=str, required=True, help="The output zarr path after block-reduction.")
+        parser.add_argument("--merge-only", type=bool, default=False, help="If true, only merge the input archives without further processing.")
 
 
 
@@ -106,10 +90,26 @@ def main(argv: list[str]) -> None:
     main_options = options.get_all_options()
     custom_options = options.view_as(CustomOptions)
 
-    assert custom_options.raw_archive, "Must specify --raw_archive"
-    assert custom_options.reduced_archive, "Must specify --reduced_archive"
+    assert custom_options.raw_archive or custom_options.raw_archives, "Must specify one of --raw_archive or --raw_archives"
 
-    ds_on_disk, source_chunks = xbeam.open_zarr(custom_options.raw_archive)
+
+    if custom_options.raw_archive:
+        if custom_options.merge_only:
+            # if we only want to merge the input archive, we can just use it directly
+            raise ValueError("Cannot specify --merge-only with --raw_archive. Use --raw_archives instead for merging multiple archives.")
+        if custom_options.intermediate_archive:
+            raise ValueError("Cannot specify --intermediate_archive with --raw_archive. Use --raw_archives for merging multiple archives.")
+        # single archive case
+        ds_on_disk, source_chunks = xbeam.open_zarr(custom_options.raw_archive)
+        
+    elif custom_options.raw_archives:
+        if custom_options.merge_only and not custom_options.intermediate_archive:
+            raise ValueError("Must specify --intermediate_archive when using --raw_archives and --merge-only.")
+        # multiple archives case
+        archives = custom_options.raw_archives.split(",")
+        ds_on_disk = xr.merge([xr.open_zarr(archive) for archive in archives])
+        source_chunks = RAW_CHUNKS
+
 
     template = xbeam.make_template(ds_on_disk)
 
@@ -135,30 +135,31 @@ def main(argv: list[str]) -> None:
     print('~~~~ blocked_template ~~~~')
     print(blocked_template)
 
-    with beam.Pipeline(options=options) as root:
-        _ = (
-            root 
-            # First pull in the dataset and write it to chunks
-            | xbeam.DatasetToChunks(ds_on_disk, chunks=source_chunks)
-            # re-org to array and assign the new coordinates
-            | beam.MapTuple(lambda k, ds: (k, to_array(ds)))
-            # rechunk making the chunks contiguous on the features dimension
-            # tofix: rechunker currently dies. Try a bigger VM? Stacked chunks at 1024?
-            # | xbeam.Rechunk( 
-            #     dim_sizes=stacked_template.sizes,
-            #     itemsize=ITEMSIZE,
-            #     source_chunks=RAW_CHUNKS_WITH_FEATURES, # 
-            #     target_chunks=STACKED_CHUNKS,
-            #     min_mem= 1024**2,  # 1 MiB
-            # )
-            | xbeam.SplitChunks({ "features": 1, "time": 1, "X": 512, "Y": 512 })
-            | xbeam.ConsolidateChunks({ "features": -1, "time": 1, "X": 512, "Y": 512 })
-            # block-reduce the dataset
-            | BlockMean(X=8,Y=8,boundary="pad")
-            # consolidate the chunks back tog
-            # | xbeam.ConsolidateChunks(target_chunks=FINAL_CHUNKS)
-            | xbeam.ChunksToZarr(custom_options.reduced_archive+"_z8", template=blocked_template, zarr_chunks=FINAL_CHUNKS)
-        )
+    if custom_options.merge_only:
+        # If we only want to merge the input archives, we can write them directly
+        with beam.Pipeline(options=options) as root:
+            _ = (
+                root 
+                | xbeam.DatasetToChunks(ds_on_disk, chunks=source_chunks)
+                | xbeam.ChunksToZarr(custom_options.intermediate_archive, template=template, zarr_chunks=RAW_CHUNKS)
+            )
+    else:
+
+        with beam.Pipeline(options=options) as root:
+            _ = (
+                root 
+                # First pull in the dataset and write it to chunks
+                | xbeam.DatasetToChunks(ds_on_disk, chunks=source_chunks)
+                # re-org to array and assign the new coordinates
+                | beam.MapTuple(lambda k, ds: (k, to_array(ds)))
+                | xbeam.SplitChunks({ "features": 1, "time": 1, "X": 512, "Y": 512 })
+                | xbeam.ConsolidateChunks({ "features": -1, "time": 1, "X": 512, "Y": 512 })
+                # block-reduce the dataset
+                | BlockMean(X=8,Y=8,boundary="pad")
+                # consolidate the chunks back together
+                # | xbeam.ConsolidateChunks(target_chunks=FINAL_CHUNKS)
+                | xbeam.ChunksToZarr(custom_options.reduced_archive+"_z8", template=blocked_template, zarr_chunks=FINAL_CHUNKS)
+            )
 
 if __name__ == "__main__":
     import sys
