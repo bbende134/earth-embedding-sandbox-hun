@@ -152,12 +152,10 @@ def main(argv: list[str]) -> None:
         ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL")
         .filterDate(ee.Date("2023-12-30"), ee.Date("2024-01-02"))
         .filterBounds(aoi_ee)
-        .filter(ee.Filter.eq("UTM_ZONE", utm_abbrev))
         .select(bands)
         .mosaic()
         .clip(aoi_ee)
     )
-    print(im_float.getInfo())
 
     # Optionally quantize according to the original paper https://arxiv.org/pdf/2507.22291
     # im_quantized = (
