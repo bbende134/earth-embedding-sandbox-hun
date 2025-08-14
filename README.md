@@ -23,7 +23,7 @@ This project contains a few components to demonstrate this roundtrip.
 
 **2. Loading and serving embeddings in a vector database**
 - A Milvus vector database is spun up to serve embeddings. Milvus is an open-source vector database that uses local or remote data as its filestore.
-- The embeddings are stored with a simple schema to allow their retrieval: `z: int, x: int, y: int, E: 64[float32]`. `z` is the block zoom level (8, 16, 32, etc.); `x,y` are the easting and northing pixel centroid coordinates in the British National Grid coordinate reference system (EPSG:27700). This coordinate reference system was chosen because it is euclidean and expressed in meters - analagous to a UTM zone centred on the UK.
+- The embeddings are stored with a simple schema to allow their retrieval: `z: int, x: int, y: int, E: 64[float32]`. `z` is the block zoom level (8, 16, 32, etc.); `x,y` are the easting and northing pixel centroid coordinates in the UTM 30N coordinate reference system (EPSG:32630). The embedding images are actually stored in Earth Engine in UTM, and the east-most 30N UTM tile extends to the east coast of england. We also want a euclidean (meters) CRS so we can pass our pooling functions without distortions.
 - the mean-pooled embeddings from the six zoom levels are then loaded into the vector database. The vector indices are also stored on GCS, which means anyone can spin up a Milvus client and use them.
 
 **3. Exposing a map UI to allow a user to submit a polygon query**
@@ -50,7 +50,7 @@ You can also use the embeddings I've already extracted, they're publicly availab
 
 1. Create a new GCP project, sign up for Earth Engine, and register your project.
 2. You'll need a service account to make everything very portable. In your GCP project, navigate to `IAM & Admin -> Service Accounts` and `+ Create Service Account`. Give your service account a sensble email and description and the following roles: `Artifact Registry Administrator,Dataflow Worker,Earth Engine Resource Viewer,Earth Engine Resourse Writer,Storage Admin,Owner`. Create a JSON key, download it, and keep it safe!
-3. you may need to initiatialise a few apis on GCP: `Google Earth Engine, Dataflow, Cloud Logging, Cloud Monitoring, Compute Engine, Artifact Registry`
+3. you may need to initiatialise a few apis on GCP: `Google Earth Engine, Dataflow, Cloud Logging, Cloud Monitoring, Compute Engine, Artifact Registry`. Search each of these in the GCP omni searchbar and enable them.
 
 ### Environment
 
@@ -110,11 +110,11 @@ First you'll need to push your docker container to your artifact registry:
 
     gcloud auth configure-docker
 
-There are four pipelines that can be run:
+There are four pipelines that can be run either locally with the beam DirectRunner or on GCP's Dataflow.
 
- - **0. Extract**: Retrieve the embeddings from Earth Engine and save them to a zarr archive.
- - **1. Consolidate**: Re-chunk the embeddings to make them contiguous in the embedding dimension, and stride the first MeanPool reduction.
- - **2. Reduce**: Stride the remaining MeanPool reductions, resulting in 8,16,32,64,128, and 256px (i.e. up to 2.5km square) reductions.
+ - **0. Extract**: Retrieve the embeddings from Earth Engine and save them to a zarr archive. Run it with `make extract-<dataflow/local>`. You can also run the extraction band-wise with `make extract-dataflow-bandwise`.
+ - **1. Consolidate**: Re-chunk the embeddings to make them contiguous in the embedding dimension, and stride the first MeanPool reduction. Run it with `make consolidate-<dataflow/local>`
+ - **2. Reduce**: Stride the remaining MeanPool reductions, resulting in 8,16,32,64,128, and 256px (i.e. up to 2.5km square) reductions. Run `make reduce-<dataflow/local>`.
  - **3. Load into DB**: Load the embeddings into the vector database and index them.
 
 

@@ -3,6 +3,9 @@ SHELL := /bin/bash
 include .env
 export
 
+# ####################### #
+# docker building and pushing for the beam sdk container
+# ####################### #
 docker-auth:
 	gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
 	gcloud auth configure-docker
@@ -13,6 +16,34 @@ docker-build:
 docker-push:
 	docker push $$sdk_container_image
 
+# ####################### #
+# docker compose commands #
+# ####################### #
+
+# dev build has no api (use with e.g. FastAPI TestClient)
+up-build-dev:
+	docker compose -f infra/docker-compose-dev.yaml up --build
+
+down-v-dev:
+	docker compose -f infra/docker-compose-dev.yaml down -v
+
+# standard build includes API (e.g. for frontend dev)
+up-build:
+	docker compose -f infra/docker-compose.yaml up --build
+
+down-v:
+	docker compose -f infra/docker-compose.yaml down -v
+
+# app build includes front-end
+up-build-app:
+	docker compose -f infra/docker-compose-app.yaml up --build
+
+down-v-app:
+	docker compose -f infra/docker-compose-app.yaml down -v
+
+# ####################### #
+# ### pipeline steps #### #
+# ####################### #
 extract-dataflow:
 	python pipeline/0_extract.py \
 		--input_geojson $$geojson_path \
@@ -59,9 +90,8 @@ extract-dataflow-bandwise:
 			--machine_type $${machine_type_extract}; \
 	done
 
-
 extract-local:
-	python pipeline/consolidated_extract.py \
+	python pipeline/0_extract.py \
 		--input_geojson $$geojson_path \
 		--raw_archive $$raw_archive \
 		--runner DirectRunner \
@@ -70,7 +100,6 @@ extract-local:
 		--scale $$scale \
 		--num_workers $$max_num_workers \
 		--ee_max_num_workers $$ee_max_num_workers
-
 
 consolidate-dataflow:
 	python pipeline/1_consolidate.py \
