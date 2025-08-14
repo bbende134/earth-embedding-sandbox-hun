@@ -66,6 +66,7 @@ ignore = [
     # Ignoring since we need to use Depends(BearerExtractValidate()) in all route
     # parameters for FastAPI
     "B008",
+    "N999", # leading digits for pipeline steps
 ]
 
 [tool.ruff.lint.flake8-bugbear]
