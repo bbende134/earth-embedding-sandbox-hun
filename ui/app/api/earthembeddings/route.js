@@ -54,6 +54,12 @@ function evaluate(obj) {
   );
 }
 
+async function loadGeoJSONFromGCS(url) {
+  const res = await fetch(url, { method: "GET" });
+  if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
+  return (await res.json()) ;
+}
+
 /**
  * Function that process earth engine script
  * Earth Engine script can only be processed on the server. So you cannot run it on the browser
@@ -63,6 +69,12 @@ export async function GET(req) {
   try {
     const key = process.env.EE_SERVICE_ACCOUNT;
     await authenticate(key);
+
+    const geojson_path = process.env.EE_GEOJSON_PATH;
+
+    if (!geojson_path) {
+      throw new Error("GeoJSON path is not defined");
+    }
 
     const url = new URL(req.url);
     const bandParam = url.searchParams.get("band") || "A20"; // fallback if not provided
@@ -98,31 +110,33 @@ export async function GET(req) {
     const col = ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL");
 
     // Geojson geometry of the are we want
-    const geojson = {
-      coordinates: [
-        [
-          [103.57567457694688, -1.5538708282870601],
-          [103.57567457694688, -1.6154123989164617],
-          [103.63624333965345, -1.6154123989164617],
-          [103.63624333965345, -1.5538708282870601],
-          [103.57567457694688, -1.5538708282870601],
-        ],
-      ],
-      type: "Polygon",
-    };
+    // const geojson = {
+    //   coordinates: [
+    //     [
+    //       [103.57567457694688, -1.5538708282870601],
+    //       [103.57567457694688, -1.6154123989164617],
+    //       [103.63624333965345, -1.6154123989164617],
+    //       [103.63624333965345, -1.5538708282870601],
+    //       [103.57567457694688, -1.5538708282870601],
+    //     ],
+    //   ],
+    //   type: "Polygon",
+    // };
+    const gj = await loadGeoJSONFromGCS(geojson_path);
+    console.log(gj)
 
     // Turn the geojson geometry to ee.Geometry for filtering earth engine collection
-    const geometry = ee.Geometry(geojson);
+    const geometry = ee.Geometry(gj.geometry);
 
     // Range of date for filter
     const start = "2023-12-30";
     const end = "2024-01-02";
 
     // Filter by date and bounds
-    const filtered = col.filterDate(start, end).select(bands);
+    const filtered = col.filterDate(start, end).filterBounds(geometry).select(bands)//.filter(ee.Filter.eq("UTM_ZONE","30N"));
 
     // Create a median composite of the image
-    const mosaic = filtered.mosaic();
+    const mosaic = filtered.mosaic().clip(geometry);
 
     // Image visualization parameter
     // Using NIR-SWIR1-SWIR2 composite
@@ -140,7 +154,7 @@ export async function GET(req) {
     //const imageGeometryGeojson = await evaluate(imageGeom);
 
     // Return the result to the client/browser
-    return Response.json({ urlFormat, geojson: geojson });
+    return Response.json({ urlFormat });
   } catch (error) {
     return Response.json({ message: error.message }, { status: 500 });
   }

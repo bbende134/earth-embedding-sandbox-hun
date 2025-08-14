@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/earthengine": "^1.6.2",
+    "@mapbox/mapbox-gl-draw": "^1.5.0",
     "@turf/turf": "^7.2.0",
     "mapbox-gl": "^3.14.0",
     "next": "15.4.5",
