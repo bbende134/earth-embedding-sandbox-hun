@@ -13,6 +13,9 @@ dependencies = [
     "cloudpathlib[gs]",
     "gcsfs",
     "geojson~=3.2"
+    "fsspec",
+    "tqdm",
+    
 ]
 
 [project.optional-dependencies]

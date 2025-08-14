@@ -1,5 +1,7 @@
 # Earth Embeddings Sandbox
 
+![Status](https://img.shields.io/badge/work%20in%20progress-ffae00)
+
 A little project to extract [DeepMind's AlphaEarth](https://deepmind.google/discover/blog/alphaearth-foundations-helps-map-our-planet-in-unprecedented-detail/) embeddings, visualise them, and set up a vector database and UI for similarity search across the United Kingdom.
 
 ![img](ui.png)
@@ -77,7 +79,17 @@ Run pytests:
 
 I also use [docker] for containerisation and [make] as a dev entrypoint, so you'll need this installed.
 
+To spin up the backend dev dependencies (redis and milvus db) run the make command for docker-compose-dev:
+
+    make up-build-dev
+
+Don't forget to spin down the containers with;
+
+    make down-v-dev
+
 ### CI/CD/Terraform
+
+TBC
 
 ## Use
 
@@ -116,6 +128,13 @@ There are four pipelines that can be run either locally with the beam DirectRunn
  - **1. Consolidate**: Re-chunk the embeddings to make them contiguous in the embedding dimension, and stride the first MeanPool reduction. Run it with `make consolidate-<dataflow/local>`
  - **2. Reduce**: Stride the remaining MeanPool reductions, resulting in 8,16,32,64,128, and 256px (i.e. up to 2.5km square) reductions. Run `make reduce-<dataflow/local>`.
  - **3. Load into DB**: Load the embeddings into the vector database and index them.
+
+ ### Backup / Restore database
+
+ Following the instructions [here](https://milvus.io/blog/how-to-use-milvus-backup-tool-step-by-step-guide.md), you can backup and restore milvus databases to/from cloud storage.
+
+ 1. Download the `.tar` and extract the binary to `./infra`
+ 2. You can restore the database using `./infra/milvus-backup restore` 
 
 
 **Troubleshooting xarray-beam and xee**

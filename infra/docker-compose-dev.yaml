@@ -1,4 +1,18 @@
 services:
+  redis:
+    image: redis:7.2
+    container_name: dev-redis-api
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    expose:
+      - "${REDIS_PORT}"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "${REDIS_PORT}", "ping"]
+      interval: 5s
+      retries: 10
+      start_period: 2s
+      timeout: 1s 
+      
   etcd:
     container_name: milvus-etcd
     image: quay.io/coreos/etcd:v3.5.18
@@ -65,25 +79,6 @@ services:
     depends_on:
       - "etcd"
       - "minio"
-
-  # api:
-  #   # image: <REGION>-docker.pkg.dev/<PROJECT>/apps/geo-sim-api:latest
-  #   build:
-  #     context: ..       # directory where your FastAPI Dockerfile is
-  #     dockerfile: infra/DockerfileApp
-  #   container_name: geo-sim-api
-  #   env_file:
-  #     - ../.env
-  #   depends_on:
-  #     standalone:
-  #       condition: service_healthy
-  #   environment:
-  #     MILVUS_HOST: milvus
-  #     MILVUS_PORT: "19530"
-  #     METRIC_TYPE: "IP"
-  #   ports:
-  #     - "8000:8000"
-  #   restart: unless-stopped
 
 
 networks:

@@ -1,4 +1,18 @@
 services:
+  redis:
+    image: redis:7.2
+    container_name: dev-redis-api
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    expose:
+      - "${REDIS_PORT}"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "${REDIS_PORT}", "ping"]
+      interval: 5s
+      retries: 10
+      start_period: 2s
+      timeout: 1s 
+      
   etcd:
     container_name: milvus-etcd
     image: quay.io/coreos/etcd:v3.5.18
