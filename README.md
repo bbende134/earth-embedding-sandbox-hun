@@ -2,7 +2,7 @@
 
 A little project to extract [DeepMind's AlphaEarth](https://deepmind.google/discover/blog/alphaearth-foundations-helps-map-our-planet-in-unprecedented-detail/) embeddings, visualise them, and set up a vector database and UI for similarity search across the United Kingdom.
 
-[img]
+![img](ui.png)
 
 ## Description
 
