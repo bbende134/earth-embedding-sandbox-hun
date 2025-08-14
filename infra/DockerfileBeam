@@ -1,0 +1,8 @@
+FROM apache/beam_python3.12_sdk
+
+ENV APP_HOME=/app
+WORKDIR $APP_HOME
+
+COPY pyproject.toml .
+
+RUN pip install --no-cache-dir .
