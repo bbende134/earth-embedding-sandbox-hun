@@ -1,0 +1,27 @@
+exclude: '^(\.tox|ci/templates|\.bumpversion\.cfg)(/|$)'
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.1
+    hooks:
+      - id: ruff
+        # Rule explanations:
+        # E: pycodestyle errors (PEP 8 style checker)
+        # F: pyflakes rules (detects invalid Python code)
+        # W: pycodestyle warnings
+        # I: isort rules (sort and organize imports)
+        # N: pep8-naming rules (PEP 8 naming conventions)
+        # B: flake8-bugbear rules (catches likely bugs and design problems)
+        # A: flake8-builtins rules (checks for python builtins being used as variables)
+        # C4: flake8-comprehensions (helps write better list/set/dict comprehensions)
+        # PIE: flake8-pie rules (misc. linting rules)
+        # PL: pylint rules (general Python coding standards)
+        # RUF: Ruff-specific rules
+        # SIM: flake8-simplify (helps simplify code)
+        # TCH: flake8-type-checking (type checking related rules)
+        # UP: pyupgrade rules (upgrades syntax for newer Python versions)
+        #        args: ['--select=E,F,W,I,N,B,A,C4,PIE,PL,RUF,SIM,TCH,UP']
+        # To automatically fix errors, we can enable the following argument:
+        # args: [--select=E,F,W,I,N,B,A,C4,PIE,PL,RUF,SIM,TCH,UP, --fix]
+      - id: ruff-format
+        # By default, ruff-format will only check formatting without making changes.

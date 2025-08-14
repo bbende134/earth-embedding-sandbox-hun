@@ -1,0 +1,68 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+.coverage
+.tox/
+.nox/
+.cache/
+pytest_cache/
+
+# Environments & tools
+.env
+.env.*
+*.env
+*.log
+
+# IDEs/editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# System files
+Thumbs.db
+
+# Misc
+pip-wheel-metadata/
+*.sqlite3
+
+# Node (if using JS tooling)
+node_modules/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Ignore local data
+*.db
+*.sqlite
+
+# Ignore compiled Cython
+*.c
+
+# Ignore poetry/uv files (if using uv lock files, otherwise remove)
+uv.lock
+poetry.lock
