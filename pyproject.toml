@@ -12,6 +12,7 @@ dependencies = [
     "xarray-beam",
     "cloudpathlib[gs]",
     "gcsfs",
+    "geojson~=3.2"
 ]
 
 [project.optional-dependencies]
