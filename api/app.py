@@ -1,10 +1,11 @@
 import bisect
 import logging
 import os
+from contextlib import asynccontextmanager
 
 import numpy as np
 from area import area
-from fastapi import FastAPI, HTTPException, Query, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -12,6 +13,7 @@ from geojson_pydantic import Polygon
 from pydantic import BaseModel
 from pymilvus import Collection, connections
 from pyproj import CRS, Transformer
+from ratelimiter import rate_limiter
 from shapely import geometry
 from shapely.ops import transform
 
@@ -24,6 +26,8 @@ MILVUS_HOST = os.getenv("MILVUS_HOST", "localhost")
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
 METRIC_TYPE = os.getenv("METRIC_TYPE", "IP")  # or "L2"
 TARGET_CRS = os.getenv("TARGET_CRS")  # default to WGS84
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 
 # e.g. z16 -> 160x160m -> 25600sqm
 AREA_THRESHOLDS = {
@@ -35,7 +39,19 @@ AREA_THRESHOLDS = {
     # 6553600: 256,
 }
 
-app = FastAPI()
+
+def connect():
+    connections.connect(alias="default", host=MILVUS_HOST, port=MILVUS_PORT)
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    connect()
+    logger.info("API connected to milvus service.")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:3000",
 ]
@@ -58,16 +74,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
-
-
-def connect():
-    connections.connect(alias="default", host=MILVUS_HOST, port=MILVUS_PORT)
-
-
-@app.on_event("startup")
-def startup():
-    connect()
-    logger.info("API connected to milvus service.")
 
 
 class QueryResponse(BaseModel):
@@ -127,12 +133,16 @@ def reproject(geom, src_crs, dst_crs):
     return transform(transformer.transform, geom)
 
 
-@app.get("/healthz")
+@app.get("/healthz", dependencies=[Depends(rate_limiter(limit=10, window=60))])
 def healthz():
     return {"ok": True}
 
 
-@app.post("/neighbours", response_model=QueryResponse)
+@app.post(
+    "/neighbours",
+    response_model=QueryResponse,
+    dependencies=[Depends(rate_limiter(limit=10, window=60))],
+)
 def neighbors(neighbour_query: NeighbourQuery):
     try:
         polygon = Polygon(**neighbour_query.geojson)

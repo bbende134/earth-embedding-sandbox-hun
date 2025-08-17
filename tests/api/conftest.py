@@ -4,6 +4,6 @@ from pytest import fixture
 
 @fixture()
 def client():
-    from api.app import app
+    from app import app
 
     return TestClient(app)

@@ -2,7 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir fastapi uvicorn[standard] pymilvus xarray zarr gcsfs fsspec tqdm geojson-pydantic area geojson shapely pyproj
+COPY pyproject.toml .
+
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir .
 
 COPY api/app.py .
 

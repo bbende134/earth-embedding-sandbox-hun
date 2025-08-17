@@ -12,10 +12,13 @@ dependencies = [
     "xarray-beam",
     "cloudpathlib[gs]",
     "gcsfs",
-    "geojson~=3.2"
+    "geojson~=3.2",
     "fsspec",
+    "fastapi",
+    "area",
     "tqdm",
-    
+    "redis",
+    "geojson-pydantic"
 ]
 
 [project.optional-dependencies]
@@ -26,7 +29,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-namespaces = true
+where = ["api"]
 
 
 [tool.ruff]

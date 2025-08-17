@@ -1,7 +1,7 @@
 services:
   redis:
     image: redis:7.2
-    container_name: dev-redis-api
+    container_name: redis-embeddings
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     expose:
