@@ -131,11 +131,23 @@ There are four pipelines that can be run either locally with the beam DirectRunn
 
  ### Backup / Restore database
 
- Following the instructions [here](https://milvus.io/blog/how-to-use-milvus-backup-tool-step-by-step-guide.md), you can backup and restore milvus databases to/from cloud storage.
+ GCS is providing the datastore, but we still need to backup the database indices and such.
 
- 1. Download the `.tar` and extract the binary to `./infra`
- 2. You can restore the database using `./infra/milvus-backup restore` 
+ Let's just write our whole volume to cloud storage and restore it from there.
 
+ First make sure you have permissions to move your files:
+
+    find <your-local-volue> -exec chmod a+rx {} +
+
+Now move them to cloud storage
+
+    gsutil -m cp <your-local-volume> gs://<your-bucket>/<your-path>/volume
+
+To restore them, simple copy back to the volume before spinning up. 
+
+(There is also apparently a way to snapshot and restore based on etcdctl alone, but let's just backup the whole volume for now.)
+
+    docker exec -it <container-id> etcdctl --endpoints=http://127.0.0.1:2379 snapshot save /etcd/snapshot.db
 
 **Troubleshooting xarray-beam and xee**
 Getting xarray-beam and xee to pull data smoothly was a bit of a struggle. The high-volume endpoint has a concurrency quota. The amount of concurrent requests you can make depends on your account level: [20](https://cloud.google.com/earth-engine/pricing#individual-smb) for individual, basic, or SMB enterprise accounts, or maybe [40](https://developers.google.com/earth-engine/guides/usage) for non-commercial projects? Here are a few troubleshooting notes:

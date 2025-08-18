@@ -11,7 +11,7 @@ docker-auth:
 	gcloud auth configure-docker
 
 docker-build:
-	docker build -t $$sdk_container_image -f infra/DockerfileBeam .
+	docker build -t $$sdk_container_image -f infra/DockerfileBeam . --no-cache
 
 docker-push:
 	docker push $$sdk_container_image

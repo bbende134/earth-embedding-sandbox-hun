@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY pyproject.toml .
 
+COPY api/ ./api/
+
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir .
 
-COPY api/app.py .
-
 EXPOSE 8000
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]

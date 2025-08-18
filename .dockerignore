@@ -66,3 +66,8 @@ node_modules/
 # Ignore poetry/uv files (if using uv lock files, otherwise remove)
 uv.lock
 poetry.lock
+
+data/
+public/
+*.txt
+*.json

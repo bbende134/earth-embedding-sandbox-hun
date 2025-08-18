@@ -4,6 +4,7 @@ import os
 from contextlib import asynccontextmanager
 
 import numpy as np
+import redis
 from area import area
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -13,14 +14,14 @@ from geojson_pydantic import Polygon
 from pydantic import BaseModel
 from pymilvus import Collection, connections
 from pyproj import CRS, Transformer
-from ratelimiter import rate_limiter
 from shapely import geometry
 from shapely.ops import transform
 
+from api.ratelimiter import check_redis_connection, rate_limiter
 from geojson import Feature, FeatureCollection
 
 EMB_DIM = 64
-COLLECTION = "geo_embeddings"
+COLLECTION = os.getenv("COLLECTION", "geo_embeddings")
 
 MILVUS_HOST = os.getenv("MILVUS_HOST", "localhost")
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
@@ -35,8 +36,8 @@ AREA_THRESHOLDS = {
     25600: 16,
     102400: 32,
     409600: 64,
-    # 1638400: 128, # current dev dataset doesn't have 128 or 256 yet
-    # 6553600: 256,
+    1638400: 128,
+    6553600: 256,
 }
 
 
@@ -46,7 +47,15 @@ def connect():
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    try:
+        check_redis_connection()
+    except redis.ConnectionError:
+        raise HTTPException(
+            status_code=503, detail="Redis connection failed. Please check your Redis service."
+        )
     connect()
+    col = Collection(COLLECTION)
+    col.load()
     logger.info("API connected to milvus service.")
     yield
 

@@ -11,6 +11,15 @@ REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
 
 
+def check_redis_connection():
+    """Check if Redis is reachable."""
+    try:
+        r.ping()
+        return True
+    except redis.ConnectionError:
+        return False
+
+
 # Configurable rate limiter dependency
 def rate_limiter(limit: int = 5, window: int = 60):
     def dependency(request: Request):
