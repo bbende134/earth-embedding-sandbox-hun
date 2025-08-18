@@ -95,7 +95,7 @@ class QueryResponse(BaseModel):
 
 class NeighbourQuery(BaseModel):
     geojson: dict
-    k: int = Query(20, ge=1, le=40)
+    k: int = Query(20, ge=1, le=200)
     nprobe: int = Query(32, le=64)
 
 

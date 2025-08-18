@@ -68,7 +68,7 @@ export default function EarthEmbeddings() {
   const [minValues, setMinValues] = useState(["-0.3","-0.3","-0.3"]);
   const [maxValues, setMaxValues] = useState(["0.3","0.3","0.3"]);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [k, setK] = useState<number>(5); // allow user to increase up to 40
+  const [k, setK] = useState<number>(5); // allow user to increase up to 200
   const kRef = useRef(k);
 
 
@@ -569,7 +569,7 @@ export default function EarthEmbeddings() {
                 <input
                   type="range"
                   min={0}
-                  max={40}
+                  max={200}
                   step={1}
                   value={k}
                   onChange={(e) => setK(parseInt(e.target.value, 10))}
@@ -578,11 +578,11 @@ export default function EarthEmbeddings() {
                 <input
                   type="number"
                   min={0}
-                  max={40}
+                  max={200}
                   step={1}
                   value={k}
                   onChange={(e) => {
-                    const val = Math.max(0, Math.min(40, Number(e.target.value)));
+                    const val = Math.max(0, Math.min(200, Number(e.target.value)));
                     console.log("set k", val);
                     setK(val);
                   }}
