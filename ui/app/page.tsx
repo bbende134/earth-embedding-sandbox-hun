@@ -154,9 +154,9 @@ export default function EarthEmbeddings() {
 
     // Add or update the source
     if (map.getSource(RESULT_SOURCE_ID)) {
-      (map.getSource(RESULT_SOURCE_ID) as mapboxgl.GeoJSONSource).setData(fc as any);
+      (map.getSource(RESULT_SOURCE_ID) as mapboxgl.GeoJSONSource).setData(fc);
     } else {
-      map.addSource(RESULT_SOURCE_ID, { type: "geojson", data: fc as any });
+      map.addSource(RESULT_SOURCE_ID, { type: "geojson", data: fc});
     }
 
     // Ensure fill layer exists
@@ -216,8 +216,8 @@ export default function EarthEmbeddings() {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!;
     const map = new mapboxgl.Map({
       container: mapIdDiv,
-      zoom: 11,
-      center: [-3., 51.6],
+      zoom: 7,
+      center: [-1.804, 53.141],
       style: "mapbox://styles/mapbox/standard-satellite",
     });
     mapRef.current = map;
@@ -377,9 +377,7 @@ export default function EarthEmbeddings() {
   }
 
   // If it's a MultiPolygon, send just the first polygon as a single Polygon
-  let featureToSend: GeoJSON.Feature<GeoJSON.Polygon>;
-  featureToSend = poly as GeoJSON.Feature<GeoJSON.Polygon>;
-  
+  const featureToSend: GeoJSON.Feature<GeoJSON.Polygon> = poly as GeoJSON.Feature<GeoJSON.Polygon>;
 
   try {
     console.log("send k", currentK);
@@ -397,13 +395,9 @@ export default function EarthEmbeddings() {
 
     // Expect a FeatureCollection back
     const result = (await resp.json())
-    console.log('result',result)
     const resultFC = result.neighbours as GeoJSON.FeatureCollection;
-    console.log('rfc')
-    console.log(resultFC)
 
-    map.getSource(RESULT_SOURCE_ID)?.setData(resultFC as any);
-    console.log(map?.getSource(RESULT_SOURCE_ID))
+    (map.getSource(RESULT_SOURCE_ID) as mapboxgl.GeoJSONSource)?.setData(resultFC);
 
     // Replace whatever is currently on the map with the new FeatureCollection
     //upsertResultFeatureCollection(resultFC);
@@ -449,9 +443,9 @@ export default function EarthEmbeddings() {
 
             <p style={{ fontSize: 11, marginBottom: 8, textAlign: "justify" }}> 
               With this demo you can inspect the new <a style={{ color: "cyan" }} href="https://deepmind.google/discover/blog/alphaearth-foundations-helps-map-our-planet-in-unprecedented-detail/">AlphaEarth Foundations</a> embeddings from Google Deepmind and query them using a drawn polygon. 
-              These embeddings are a general-purpose vector representation of every 10mx10m are on Earth's land surface area, trained on a large corpus of satellite data and text.
+              These embeddings are a general-purpose vector representation of every 10mx10m are on Earth&apos;s land surface area, trained on a large corpus of satellite data and text.
               One of the most promising applications of general-purpose embeddings is to enable similarity search and change detection with no required training or finetuning.
-              Draw a polygon on the map to select an area of interest, then click the "🔎 Search" button to find similar areas in the dataset!
+              Draw a polygon on the map to select an area of interest, then click the &quot;🔎 Search&quot; button to find similar areas in the dataset!
             </p>
 
             <p style={{ fontSize: 11, marginBottom: 8, textAlign: "justify" }}>
@@ -560,8 +554,8 @@ export default function EarthEmbeddings() {
             <p style={{ fontSize: 11, marginBottom: 8, textAlign: "justify" }}>
               Similarity search uses the embeddings of the drawn polygon to find similar areas in the dataset.
               Adjust the number of neighbours (k) to control how many similar areas are returned.
-              These are the closest 'neighbours' in the embedding space - areas that have the most similar vector representations.
-              Search is sensitive to the drawn polygon's size - you should get results that are similar in scale to the drawn area.
+              These are the closest &apos;neighbours&apos; in the embedding space - areas that have the most similar vector representations.
+              Search is sensitive to the drawn polygon&apos;s size - you should get results that are similar in scale to the drawn area.
             </p>
             <div style={{ marginTop: 16 }}>
               <h3 style={{ margin: 0, marginBottom: 8, fontSize: 14 }}>Neighbours (k)</h3>
@@ -592,7 +586,7 @@ export default function EarthEmbeddings() {
             </div>
             <hr style={{ margin: "16px 0" }} />
       <p style={{ fontSize: 10, marginBottom: 8, textAlign: "justify" }}>
-              Some technical details: the embeddings have been extracted from Google Earth Engine using Apache Beam, GCP's Dataflow, <a style={{ color: "cyan" }} href="https://xarray-beam.readthedocs.io/en/latest/index.html">xarray-beam</a>, and <a style={{ color: "cyan" }} href="https://github.com/google/Xee/tree/main/xee">xee</a>.
+              Some technical details: the embeddings have been extracted from Google Earth Engine using Apache Beam, GCP&apos;s Dataflow, <a style={{ color: "cyan" }} href="https://xarray-beam.readthedocs.io/en/latest/index.html">xarray-beam</a>, and <a style={{ color: "cyan" }} href="https://github.com/google/Xee/tree/main/xee">xee</a>.
               The embeddings have been mean-pooled through a pyramid of spatial reductions and stored in a <a style={{ color: "cyan" }} href="https://milvus.io/">Milvus</a> database.
               A <a style={{ color: "cyan" }} href="https://fastapi.tiangolo.com/">FastAPI</a> application handles the similarity search.
               This UI is built with React and <a style={{ color: "cyan" }} href="https://nextjs.org/">Next.js</a>, and is served using <a style={{ color: "cyan" }} href="https://vercel.com/">Vercel</a>.

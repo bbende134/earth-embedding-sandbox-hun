@@ -41,19 +41,6 @@ function getMapId(image, vis) {
   });
 }
 
-/**
- * Function to get an actual value of an ee object
- * @param {any} obj
- * @returns {any}
- */
-function evaluate(obj) {
-  return new Promise((resolve, reject) =>
-    obj.evaluate((result, error) =>
-      error ? reject(new Error(error)) : resolve(result)
-    )
-  );
-}
-
 async function loadGeoJSONFromGCS(url) {
   const res = await fetch(url, { method: "GET" });
   if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);

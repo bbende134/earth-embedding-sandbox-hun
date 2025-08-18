@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const TARGET = process.env.BACKEND_API_URL ?? "http://127.0.0.1:8080"; // VM IP:PORT
 
 async function proxy(req: NextRequest, path: string) {
@@ -22,10 +24,11 @@ async function proxy(req: NextRequest, path: string) {
 }
 
 export const runtime = "nodejs"; // needs Node runtime (not edge)
-export async function GET(req: NextRequest, { params }: { params: { path: string[] } }) { 
-  return proxy(req, (params.path ?? []).join("/")); 
+export async function GET(req: NextRequest, ctx: any) {
+  const path = (ctx?.params?.path as string[] | undefined) ?? [];
+  return proxy(req, path.join("/"));
 }
-export async function POST(req: NextRequest, ctx: any) { return GET(req, ctx); }
-export async function PUT(req: NextRequest, ctx: any) { return GET(req, ctx); }
-export async function PATCH(req: NextRequest, ctx: any) { return GET(req, ctx); }
-export async function DELETE(req: NextRequest, ctx: any) { return GET(req, ctx); }
+export const POST  = GET;
+export const PUT   = GET;
+export const PATCH = GET;
+export const DELETE= GET;
