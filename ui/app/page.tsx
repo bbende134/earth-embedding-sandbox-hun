@@ -383,7 +383,7 @@ export default function EarthEmbeddings() {
 
   try {
     console.log("send k", currentK);
-    const resp = await fetch(process.env.NEXT_PUBLIC_BACKEND_API_URL + "/neighbours", {
+    const resp = await fetch("/api/neighbours", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       // Send a SINGLE polygon feature
