@@ -36,9 +36,9 @@ This project contains a few components to demonstrate this roundtrip.
 
 ## Useage
 
-This codebase can be used a few ways. The embeddings are visualised at this app [here](). You can view the embeddings, and construct your own query polygons for similarity search.
+This codebase can be used a few ways. The embeddings are visualised at this app [here](https://earth-embedding-sandbox.vercel.app/). You can view the embeddings, and construct your own query polygons for similarity search.
 
-The embeddings have also been exported to GCS, and are available [here](). You can use these embeddings in your own work or research - but be sure to reference Google's original work! (Google has made the embeddings available under [CC-BY], which is very nice.)
+The embeddings have also been exported to GCS, and are available [here](https://console.cloud.google.com/storage/browser/earth-embeddings-public-eu4). You can use these embeddings in your own work or research - but be sure to reference Google's original work! (Google has made the embeddings available under [CC-BY], which is very nice.)
 
 You can also use the embedding database yourself if you'd like. Just spin up the database following the 'Local Use' instructions below, but point your environment variables at the cloud store where the database is materialised.
 
