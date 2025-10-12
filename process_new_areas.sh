@@ -2,12 +2,13 @@
 
 # Script to process new areas for embedding extraction
 
-AREAS=("northwest" "northeast" "southwest" "southeast")
+AREAS=($(ls small_areas/*.geojson | sed 's/small_areas\///' | sed 's/\.geojson//'))
 SERVICE_ACCOUNT="bendebarcza@gen-lang-client-0291927848.iam.gserviceaccount.com"
 PROJECT="86493264147"
 
 # Set credentials
 export GOOGLE_APPLICATION_CREDENTIALS="/home/barczabende/dev/earth-embedding-sandbox-hun/gen-lang-client-0291927848-14f8e1a428bd.json"
+export HV_URL="https://earthengine.googleapis.com"
 
 for area in "${AREAS[@]}"; do
   echo "Processing $area"
@@ -15,7 +16,7 @@ for area in "${AREAS[@]}"; do
   # Step 1: Extract raw embeddings
   echo "Running extract for $area"
   uv run python pipeline/0_extract.py \
-    --input_geojson ${area}_hungary.geojson \
+    --input_geojson small_areas/${area}.geojson \
     --utm_zone EPSG:32633 \
     --raw_archive gs://earth-embeddings-hungary-input/${area}_raw \
     --service_account_email $SERVICE_ACCOUNT \
