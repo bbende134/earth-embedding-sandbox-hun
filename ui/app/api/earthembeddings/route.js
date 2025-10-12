@@ -54,14 +54,22 @@ async function loadGeoJSONFromGCS(url) {
  */
 export async function GET(req) {
   try {
-    const key = process.env.EE_SERVICE_ACCOUNT;
+    // Read service account key from file
+    const fs = require('fs');
+    const path = require('path');
+    const keyPath = '/home/barczabende/dev/earth-embedding-sandbox-hun/gen-lang-client-0291927848-14f8e1a428bd.json';
+    console.log('Key path:', keyPath);
+    const key = fs.readFileSync(keyPath, 'utf8');
+    console.log('Key loaded successfully, length:', key.length);
+
     await authenticate(key);
+    console.log('Earth Engine authentication successful');
 
-    const geojson_path = process.env.EE_GEOJSON_PATH;
-
-    if (!geojson_path) {
-      throw new Error("GeoJSON path is not defined");
-    }
+    // Read geojson from file
+    const geojsonPath = '/home/barczabende/dev/earth-embedding-sandbox-hun/budapest.geojson';
+    console.log('GeoJSON path:', geojsonPath);
+    const gj = JSON.parse(fs.readFileSync(geojsonPath, 'utf8'));
+    console.log('GeoJSON loaded successfully');
 
     const url = new URL(req.url);
     const bandParam = url.searchParams.get("band") || "A20"; // fallback if not provided
@@ -109,7 +117,6 @@ export async function GET(req) {
     //   ],
     //   type: "Polygon",
     // };
-    const gj = await loadGeoJSONFromGCS(geojson_path);
     console.log(gj)
 
     // Turn the geojson geometry to ee.Geometry for filtering earth engine collection
@@ -143,6 +150,8 @@ export async function GET(req) {
     // Return the result to the client/browser
     return Response.json({ urlFormat });
   } catch (error) {
+    console.error('Earth Engine API error:', error);
+    console.error('Error stack:', error.stack);
     return Response.json({ message: error.message }, { status: 500 });
   }
 }

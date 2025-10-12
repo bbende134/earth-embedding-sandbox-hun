@@ -2,12 +2,14 @@ services:
   redis:
     image: redis:7.2
     container_name: redis-embeddings
+    env_file:
+      - ../.env
     ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+      - "6379:6379"
     expose:
-      - "${REDIS_PORT}"
+      - "6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "${REDIS_PORT}", "ping"]
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6379", "ping"]
       interval: 5s
       retries: 10
       start_period: 2s

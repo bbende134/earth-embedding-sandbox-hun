@@ -26,7 +26,6 @@ import pyproj
 import xarray as xr
 import xarray_beam as xbeam
 from apache_beam.options.pipeline_options import PipelineOptions
-from cloudpathlib import GSPath
 from shapely import geometry
 from shapely.geometry import shape
 from shapely.ops import transform
@@ -121,7 +120,7 @@ def main(argv: list[str]) -> None:
     )
 
     # Load the area of interest from a geojson file stored in GCS
-    with open(GSPath(custom_options.input_geojson)) as f:
+    with open(custom_options.input_geojson) as f:
         geojson = json.loads(f.read())
         aoi = shape(geojson["geometry"])
 
@@ -150,7 +149,6 @@ def main(argv: list[str]) -> None:
 
     im_float = (
         ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL")
-        .filterDate(ee.Date("2023-12-30"), ee.Date("2024-01-02"))
         .filterBounds(aoi_ee)
         .select(bands)
         .mosaic()
@@ -168,14 +166,12 @@ def main(argv: list[str]) -> None:
     #     .int8()  # Convert to int8
     # )
 
-    # 2 threads, 4 vms, standard-8 - out of cpu
-    # 8900 aois not doing; 2707 aois doing? -> 11600 sounds about right.
-    # 2707 @ 1024x1024x64x4 = 268mb x 2707 = 726gb
+    # im_float = im_quantized
 
     ds = xr.open_dataset(
         im_float,
         engine=EarthEngineBackendEntrypoint,
-        projection=ee.Projection("EPSG:32630", transform=affine),
+        projection=ee.Projection(custom_options.utm_zone, transform=affine),
         geometry=list(aoi.bounds),
         scale=scale,
         chunks=RAW_CHUNKS,
@@ -189,7 +185,7 @@ def main(argv: list[str]) -> None:
         },
         getitem_kwargs={
             "max_retries": 10,
-            "initial_delay": 1000,  # increase the delay before retrying
+            "initial_delay": 20000,  # increase the delay before retrying to respect pool size
         },
     )
 

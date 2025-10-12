@@ -169,3 +169,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+gen-lang-client-029*
+
+write.lock
+*.meta
+*zarr*
+
+*milvus*
+*minio*

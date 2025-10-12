@@ -1,7 +1,10 @@
 import os
 
 import ee
+from dotenv import load_dotenv
 from pytest import fixture
+
+load_dotenv()
 
 
 @fixture(scope="session")

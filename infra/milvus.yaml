@@ -98,21 +98,21 @@ minio:
   # minio.address and minio.port together generate the valid access to MinIO or S3 service.
   # MinIO preferentially acquires the valid IP address from the environment variable MINIO_ADDRESS when Milvus is started.
   # Default value applies when MinIO or S3 is running on the same network with Milvus.
-  address: storage.googleapis.com
-  port: 443 # Port of MinIO or S3 service.
+  address: localhost
+  port: 9000 # Port of MinIO or S3 service.
   # Access key ID that MinIO or S3 issues to user for authorized access.
   # Environment variable: MINIO_ACCESS_KEY_ID or minio.accessKeyID
   # minio.accessKeyID and minio.secretAccessKey together are used for identity authentication to access the MinIO or S3 service.
   # This configuration must be set identical to the environment variable MINIO_ACCESS_KEY_ID, which is necessary for starting MinIO or S3.
   # The default value applies to MinIO or S3 service that started with the default docker-compose.yml file.
-  accessKeyID: ${GCS_HMAC_KEY}
+  accessKeyID: minioadmin
   # Secret key used to encrypt the signature string and verify the signature string on server. It must be kept strictly confidential and accessible only to the MinIO or S3 server and users.
   # Environment variable: MINIO_SECRET_ACCESS_KEY or minio.secretAccessKey
   # minio.accessKeyID and minio.secretAccessKey together are used for identity authentication to access the MinIO or S3 service.
   # This configuration must be set identical to the environment variable MINIO_SECRET_ACCESS_KEY, which is necessary for starting MinIO or S3.
   # The default value applies to MinIO or S3 service that started with the default docker-compose.yml file.
-  secretAccessKey: ${GCS_HMAC_SECRET}
-  useSSL: true # Switch value to control if to access the MinIO or S3 service through SSL.
+  secretAccessKey: minioadmin
+  useSSL: false # Switch value to control if to access the MinIO or S3 service through SSL.
   ssl:
     tlsCACert: /path/to/public.crt # path to your CACert file
   # Name of the bucket where Milvus stores data in MinIO or S3.
@@ -121,13 +121,13 @@ minio:
   # To share an MinIO instance among multiple Milvus instances, consider changing this to a different value for each Milvus instance before you start them. For details, see Operation FAQs.
   # The data will be stored in the local Docker if Docker is used to start the MinIO service locally. Ensure that there is sufficient storage space.
   # A bucket name is globally unique in one MinIO or S3 instance.
-  bucketName: ${MILVUS_CLOUDSTORE_BUCKET}
+  bucketName: milvus-bucket
   # Root prefix of the key to where Milvus stores data in MinIO or S3.
   # It is recommended to change this parameter before starting Milvus for the first time.
   # To share an MinIO instance among multiple Milvus instances, consider changing this to a different value for each Milvus instance before you start them. For details, see Operation FAQs.
   # Set an easy-to-identify root key prefix for Milvus if etcd service already exists.
   # Changing this for an already running Milvus instance may result in failures to read legacy data.
-  rootPath: ${MILVUS_CLOUDSTORE_PATH}
+  rootPath: files
   # Whether to useIAM role to access S3/GCS instead of access/secret keys
   # For more information, refer to
   # aws: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html
@@ -143,7 +143,7 @@ minio:
   # You can use "gcpnative" for the Google Cloud Platform provider. Uses service account credentials
   # for authentication.
   # When useIAM enabled, only "aws", "gcp", "aliyun" is supported for now
-  cloudProvider: gcp
+  cloudProvider: aws
   # The JSON content contains the gcs service account credentials.
   # Used only for the "gcpnative" cloud provider.
   # gcpCredentialJSON:  /home/lucas/repos/lk/earth-embedding-sandbox/embeddings-demo-key.json
@@ -916,7 +916,7 @@ common:
     BeamWidthRatio: 4
   gracefulTime: 5000 # milliseconds. it represents the interval (in ms) by which the request arrival time needs to be subtracted in the case of Bounded Consistency.
   gracefulStopTimeout: 1800 # seconds. it will force quit the server if the graceful stop process is not completed during this time.
-  storageType: remote # please adjust in embedded Milvus: local, available values are [local, remote, opendal], value minio is deprecated, use remote instead
+  storageType: local # please adjust in embedded Milvus: local, available values are [local, remote, opendal], value minio is deprecated, use remote instead
   # Default value: auto
   # Valid values: [auto, avx512, avx2, avx, sse4_2]
   # This configuration is only used by querynode and indexnode, it selects CPU instruction set for Searching and Index-building.

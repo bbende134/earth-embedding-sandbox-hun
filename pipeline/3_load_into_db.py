@@ -14,7 +14,7 @@ ZARR_ROOT = os.environ["reduced_archive"]  # e.g. "gcs://my-bucket/embeddings.za
 PROJECT = os.environ["GCP_PROJECT_ID"]
 EMB_DIM = 64
 METRIC_TYPE = os.getenv("METRIC_TYPE", "IP")  # or "L2"
-ZOOM_PYRAMID_LEVELS = [8, 16, 32, 64, 128, 256]
+ZOOM_PYRAMID_LEVELS = [16, 32, 64, 128, 256]
 
 MILVUS_HOST = os.getenv("MILVUS_HOST", "localhost")
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
@@ -65,11 +65,18 @@ def reshape(block, z):
         .stack(xy=("X", "Y"))
         .transpose("xy", "features")
         .to_pandas()
-        .dropna()
-        .apply(lambda r: np.asarray(r.tolist(), dtype=np.float32, order="C"), axis=1)
+        .fillna(0)  # fill NaN with 0
+        .dropna()  # in case lat/lon are NaN, but they shouldn't be
+    )
+    print(f"Before dropna: {len(df)} records, has na: {df.isna().any().any()}")
+    df = df.dropna()
+    print(f"After dropna: {len(df)} records")
+    df = (
+        df.apply(lambda r: np.asarray(r.tolist(), dtype=np.float32, order="C"), axis=1)
         .reset_index()
         .rename(columns={0: "embedding", "X": "lon", "Y": "lat"})
     )
+    print(f"Reshaped {len(df)} records for z={z}")
     df["z"] = z
 
     records = df.to_dict(orient="records")
@@ -95,14 +102,15 @@ def main():
             records += reshape(zx["embeddings"].isel(isel_dict), z=level)
 
             if len(records) >= BATCH:
-                try:
-                    logger.info(f"Inserting {len(records)} records into Milvus")
-                    col.insert(records)
-                    col.flush()
-                    records = []
-                except Exception as e:
-                    logger.error(f"Error inserting records into Milvus: {e}")
-                    raise e
+                logger.info(f"Inserting {len(records)} records into Milvus")
+                col.insert(records)
+                col.flush()
+                records = []
+
+    if records:
+        logger.info(f"Inserting remaining {len(records)} records into Milvus")
+        col.insert(records)
+        col.flush()
 
 
 if __name__ == "__main__":

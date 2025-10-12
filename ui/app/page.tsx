@@ -65,8 +65,8 @@ export default function EarthEmbeddings() {
   const labelLayerIdsRef = useRef<string[]>([]);
   const [isRGB, setIsRGB] = useState(true);
   const [bands, setBands] = useState(["A00","A01","A02"]); // Grayscale or [R, G, B]
-  const [minValues, setMinValues] = useState(["-0.3","-0.3","-0.3"]);
-  const [maxValues, setMaxValues] = useState(["0.3","0.3","0.3"]);
+  const [minValues, setMinValues] = useState(["-1","-1","-1"]);
+  const [maxValues, setMaxValues] = useState(["1","1","1"]);
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [k, setK] = useState<number>(5); // allow user to increase up to 200
   const kRef = useRef(k);
@@ -75,6 +75,8 @@ export default function EarthEmbeddings() {
   // UI state for layer visibility + labels toggle
   const [eeVisible, setEeVisible] = useState(true);
   const [labelsVisible, setLabelsVisible] = useState(false);
+  const [visualizationMode, setVisualizationMode] = useState<'points' | 'polygons'>('points');
+  const [lastResult, setLastResult] = useState<GeoJSON.FeatureCollection>({ type: 'FeatureCollection', features: [] });
 
   // lightweight draw state
   // New: track if any polygon exists
@@ -159,23 +161,17 @@ export default function EarthEmbeddings() {
       map.addSource(RESULT_SOURCE_ID, { type: "geojson", data: fc});
     }
 
-    // Ensure fill layer exists
+    // Ensure circle layer exists
     if (!map.getLayer(RESULT_FILL_ID)) {
       map.addLayer({
         id: RESULT_FILL_ID,
-        type: "fill",
+        type: "circle",
         source: RESULT_SOURCE_ID,
-        paint: { "fill-opacity": 0.25 },
-      });
-    }
-
-    // Ensure outline layer exists (on top of fill)
-    if (!map.getLayer(RESULT_LINE_ID)) {
-      map.addLayer({
-        id: RESULT_LINE_ID,
-        type: "line",
-        source: RESULT_SOURCE_ID,
-        paint: { "line-width": 2 },
+        paint: { 
+          "circle-color": "#FF5722",
+          "circle-radius": 8,
+          "circle-opacity": 0.8
+        },
       });
     }
   }
@@ -214,10 +210,15 @@ export default function EarthEmbeddings() {
   // Map setup
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!;
+    // Disable Mapbox telemetry
+    (mapboxgl.config as any).ENABLE_TELEMETRY = false;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mapbox:events:enabled', 'false');
+    }
     const map = new mapboxgl.Map({
       container: mapIdDiv,
       zoom: 7,
-      center: [-1.804, 53.141],
+      center: [19.0402, 47.4979], // Budapest coordinates
       style: "mapbox://styles/mapbox/standard-satellite",
     });
     mapRef.current = map;
@@ -249,13 +250,22 @@ export default function EarthEmbeddings() {
         type: "circle", 
         source: RESULT_SOURCE_ID, 
         paint: {
-            'circle-radius': 6,
             'circle-color': '#FF5722',
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#fff'
-        }
+            'circle-radius': 8,
+            'circle-opacity': 0.8
+        },
+        layout: { visibility: visualizationMode === 'points' ? 'visible' : 'none' }
       });
-      //map.addLayer({ id: RESULT_LINE_ID, type: "line", source: RESULT_SOURCE_ID, paint: { "line-width": 2 } });
+      map.addLayer({
+        id: RESULT_LINE_ID,
+        type: "fill",
+        source: RESULT_SOURCE_ID,
+        paint: {
+          'fill-color': '#FF5722',
+          'fill-opacity': 0.6
+        },
+        layout: { visibility: visualizationMode === 'polygons' ? 'visible' : 'none' }
+      });
 
       drawRef.current = draw;
 
@@ -328,21 +338,66 @@ export default function EarthEmbeddings() {
     setBasemapLabels(labelsVisible);
   }, [labelsVisible]);
 
+  // Toggle result visualization mode
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (map.getLayer(RESULT_FILL_ID)) {
+      map.setLayoutProperty(RESULT_FILL_ID, "visibility", visualizationMode === 'points' ? 'visible' : 'none');
+    }
+    if (map.getLayer(RESULT_LINE_ID)) {
+      map.setLayoutProperty(RESULT_LINE_ID, "visibility", visualizationMode === 'polygons' ? 'visible' : 'none');
+    }
+
+    // Re-apply visualization to existing results
+    if (lastResult && lastResult.features.length > 0) {
+      const visualizedFC = applyVisualizationMode(lastResult);
+      (map.getSource(RESULT_SOURCE_ID) as mapboxgl.GeoJSONSource)?.setData(visualizedFC);
+    }
+  }, [visualizationMode, lastResult]);
+
   // Mode toggle (RGB vs grayscale)
   const handleModeToggle = () => {
     setIsRGB((prev) => {
       const next = !prev;
       if (next) {
         setBands(["A00", "A01", "A02"]);
-        setMinValues(["-0.3", "-0.3", "-0.3"]);
-        setMaxValues(["0.3", "0.3", "0.3"]);
+        setMinValues(["-1", "-1", "-1"]);
+        setMaxValues(["1", "1", "1"]);
       } else {
         setBands(["A00"]);
-        setMinValues(["-0.3"]);
-        setMaxValues(["0.3"]);
+        setMinValues(["-1"]);
+        setMaxValues(["1"]);
       }
       return next;
     });
+  };
+
+  // Function to apply visualization mode to feature collection
+  const applyVisualizationMode = (fc: GeoJSON.FeatureCollection): GeoJSON.FeatureCollection => {
+    if (visualizationMode === 'polygons') {
+      return {
+        ...fc,
+        features: fc.features.map(f => {
+          const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
+          const size = 0.05; // bigger squares for better visibility
+          return {
+            ...f,
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [lon - size/2, lat - size/2],
+                [lon + size/2, lat - size/2],
+                [lon + size/2, lat + size/2],
+                [lon - size/2, lat + size/2],
+                [lon - size/2, lat - size/2]
+              ]]
+            }
+          };
+        })
+      };
+    }
+    return fc; // return as points
   };
 
   // Draw actions
@@ -381,7 +436,7 @@ export default function EarthEmbeddings() {
 
   try {
     console.log("send k", currentK);
-    const resp = await fetch("/api/neighbours", {
+        const resp = await fetch(`http://${window.location.hostname}:8000/neighbours`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       // Send a SINGLE polygon feature
@@ -397,7 +452,13 @@ export default function EarthEmbeddings() {
     const result = (await resp.json())
     const resultFC = result.neighbours as GeoJSON.FeatureCollection;
 
-    (map.getSource(RESULT_SOURCE_ID) as mapboxgl.GeoJSONSource)?.setData(resultFC);
+    // Store the original result (points)
+    setLastResult(resultFC);
+
+    // Apply visualization mode
+    const visualizedFC = applyVisualizationMode(resultFC);
+
+    (map.getSource(RESULT_SOURCE_ID) as mapboxgl.GeoJSONSource)?.setData(visualizedFC);
 
     // Replace whatever is currently on the map with the new FeatureCollection
     //upsertResultFeatureCollection(resultFC);
@@ -409,7 +470,19 @@ export default function EarthEmbeddings() {
 
   } catch (e) {
     console.error(e);
-    alert("Failed to send polygon. See console for details.");
+    let errorMessage = "Failed to send polygon. See console for details.";
+    if (e instanceof Error) {
+      try {
+        const errorData = JSON.parse(e.message);
+        if (errorData.detail) {
+          errorMessage = `Error: ${errorData.detail}`;
+        }
+      } catch {
+        // If not JSON, use the message as is
+        errorMessage = e.message;
+      }
+    }
+    alert(errorMessage);
   }
 };
 
@@ -425,7 +498,7 @@ export default function EarthEmbeddings() {
           color: "#fff",
           borderRight: "1px solid #333",
           padding: drawerOpen ? "1rem" : "0.5rem",
-          overflow: "hidden",
+          overflow: "auto",
           fontSize: 13,               // smaller overall text in drawer
           lineHeight: 1.3,
         }}
@@ -473,6 +546,26 @@ export default function EarthEmbeddings() {
                 />
                 Show place labels
               </label>
+              {/* 3) visualization mode toggle */}
+              <div style={{ marginTop: 8 }}>
+                <label style={{ display: "block", marginBottom: 4 }}>Result Visualization</label>
+                <select
+                  value={visualizationMode}
+                  onChange={(e) => setVisualizationMode(e.target.value as 'points' | 'polygons')}
+                  style={{
+                    background: "#111",
+                    color: "#fff",
+                    border: "1px solid #444",
+                    borderRadius: 6,
+                    padding: "4px 8px",
+                    fontSize: 12,
+                    width: "100%",
+                  }}
+                >
+                  <option value="points">Points (Circles)</option>
+                  <option value="polygons">Polygons (Squares)</option>
+                </select>
+              </div>
             </div>
 
             {(() => {

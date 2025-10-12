@@ -1,15 +1,14 @@
-import bisect
 import logging
 import os
 from contextlib import asynccontextmanager
 
-import numpy as np
 import redis
 from area import area
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from geojson import Feature, FeatureCollection
 from geojson_pydantic import Polygon
 from pydantic import BaseModel
 from pymilvus import Collection, connections
@@ -18,7 +17,6 @@ from shapely import geometry
 from shapely.ops import transform
 
 from api.ratelimiter import check_redis_connection, rate_limiter
-from geojson import Feature, FeatureCollection
 
 EMB_DIM = 64
 COLLECTION = os.getenv("COLLECTION", "geo_embeddings")
@@ -26,7 +24,7 @@ COLLECTION = os.getenv("COLLECTION", "geo_embeddings")
 MILVUS_HOST = os.getenv("MILVUS_HOST", "localhost")
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
 METRIC_TYPE = os.getenv("METRIC_TYPE", "IP")  # or "L2"
-TARGET_CRS = os.getenv("TARGET_CRS")  # default to WGS84
+TARGET_CRS = "EPSG:32633"  # UTM 33N
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 
@@ -63,6 +61,7 @@ async def lifespan(_: FastAPI):
 app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:3000",
+    "http://192.168.1.72:3000",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -71,6 +70,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger("fastapi")
 
@@ -99,22 +100,27 @@ class NeighbourQuery(BaseModel):
     nprobe: int = Query(32, le=64)
 
 
-def _get_vector_for_latlon(
-    col: Collection, x_c: float, y_c: float, z: int, scale: float = 10.0
-) -> np.ndarray:
+def _get_vector_for_latlon(col: Collection, x_c: float, y_c: float, z: int, scale: float = 100.0):
     # Try get exactish match using the centroid and scale.
 
-    expr = (
-        f"lon > {x_c - z * scale / 2} and lon < {x_c + z * scale / 2} and "
-        + f"lat > {y_c - z * scale / 2} and lat < {y_c + z * scale / 2} and z == {z}"
-    )
-    res = col.query(expr=expr, output_fields=["lon", "lat", "z", "embedding"], limit=1)
-    if not res:
-        return None
-    return res[0]["embedding"]
+    for s in [100.0, 1000.0, 10000.0, 100000.0]:  # try increasing scales
+        expr = (
+            f"lon > {x_c - z * s / 2} and lon < {x_c + z * s / 2} and "
+            + f"lat > {y_c - z * s / 2} and lat < {y_c + z * s / 2} and z == {z}"
+        )
+        print(f"Query expr: {expr}")
+        res = col.query(
+            expr=expr, output_fields=["lon", "lat", "z", "embedding"], limit=10
+        )  # get more
+        print(f"Query result: {len(res)} records")
+        for r in res:
+            emb = r["embedding"]
+            if any(e != 0 for e in emb):  # find first non-zero
+                return emb
+    return None  # if all zero or none
 
 
-def which_z(query_area: float) -> str:
+def which_z(query_area: float) -> int:
     """
     z8 -> 80x80m -> 1600sqm
     z16 -> 160x160m -> 25600sqm
@@ -123,14 +129,12 @@ def which_z(query_area: float) -> str:
     z128 -> 1280x1280m -> 1638400sqm
     z256 -> 2560x2560m -> 6553600sqm
     """
-    # get the largest z that is less than the query area
-    idx = bisect.bisect_right(list(AREA_THRESHOLDS.keys()), query_area)
-
-    if idx == 0:
-        return 0
-
-    # if idx > len(AREA_THRESHOLDS), the largest z is the last one
-    return AREA_THRESHOLDS[list(AREA_THRESHOLDS.keys())[idx - 1]]
+    # get the smallest area >= query_area, return its z
+    for area in sorted(AREA_THRESHOLDS.keys()):
+        if query_area <= area:
+            return AREA_THRESHOLDS[area]
+    # if larger than all, return the largest z
+    return AREA_THRESHOLDS[sorted(AREA_THRESHOLDS.keys())[-1]]
 
 
 def reproject(geom, src_crs, dst_crs):
@@ -153,6 +157,7 @@ def healthz():
     dependencies=[Depends(rate_limiter(limit=10, window=60))],
 )
 def neighbors(neighbour_query: NeighbourQuery):
+    print("Neighbors function called")
     try:
         polygon = Polygon(**neighbour_query.geojson)
     except Exception as e:
@@ -180,7 +185,11 @@ def neighbors(neighbour_query: NeighbourQuery):
     shp_utm = reproject(shp, "EPSG:4326", TARGET_CRS)
     shp_utm_centroid = shp_utm.centroid
 
-    vec = _get_vector_for_latlon(col, shp_utm_centroid.x, shp_utm_centroid.y, query_z)
+    print(f"Query centroid UTM: {shp_utm_centroid.x}, {shp_utm_centroid.y}, z={query_z}")
+
+    vec = _get_vector_for_latlon(
+        col, shp_utm_centroid.x, shp_utm_centroid.y, query_z, scale=10000.0
+    )
     if vec is None:
         raise HTTPException(
             status_code=404, detail="No embedding found at that lat/lon (try a snapped grid point)."
@@ -197,6 +206,10 @@ def neighbors(neighbour_query: NeighbourQuery):
 
     features = []
     for h in hits:
+        embedding = h.entity.get("embedding")
+        # Skip if embedding is all zeros
+        if not any(e != 0 for e in embedding):
+            continue
         # reproject back to original CRS if needed
         if TARGET_CRS != "EPSG:4326":
             hit_pt = reproject(
@@ -206,10 +219,41 @@ def neighbors(neighbour_query: NeighbourQuery):
             hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
         properties = {
             "z": h.entity.get("z"),
-            "embedding": h.entity.get("embedding"),
+            "embedding": embedding,
             "distance": h.distance,
         }
         features.append(Feature(geometry=hit_pt, properties=properties))
+
+    # If not enough non-zero embeddings, try with larger limit
+    if len(features) < neighbour_query.k:
+        larger_limit = neighbour_query.k * 10  # try 10 times more
+        hits = col.search(
+            data=[vec],
+            anns_field="embedding",
+            param=search_params,
+            limit=larger_limit,
+            output_fields=["lon", "lat", "z", "embedding"],
+        )[0]
+        for h in hits:
+            embedding = h.entity.get("embedding")
+            if not any(e != 0 for e in embedding):
+                continue
+            if TARGET_CRS != "EPSG:4326":
+                hit_pt = reproject(
+                    geometry.Point(h.entity.get("lon"), h.entity.get("lat")),
+                    TARGET_CRS,
+                    "EPSG:4326",
+                )
+            else:
+                hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
+            properties = {
+                "z": h.entity.get("z"),
+                "embedding": embedding,
+                "distance": h.distance,
+            }
+            features.append(Feature(geometry=hit_pt, properties=properties))
+            if len(features) >= neighbour_query.k:
+                break
 
     featurecollection = FeatureCollection(features)
 
