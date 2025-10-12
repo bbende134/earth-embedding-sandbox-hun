@@ -380,7 +380,7 @@ export default function EarthEmbeddings() {
         ...fc,
         features: fc.features.map(f => {
           const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates;
-          const size = 0.05; // bigger squares for better visibility
+          const size = 0.005; // larger squares
           return {
             ...f,
             geometry: {

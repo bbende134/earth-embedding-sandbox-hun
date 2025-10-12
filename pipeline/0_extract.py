@@ -16,6 +16,7 @@ import itertools
 import json
 import logging
 import os
+import time
 from collections.abc import Iterator, Mapping, Sequence
 from typing import AbstractSet
 
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 ALL_BANDS = [f"A{i:02d}" for i in range(64)]
-RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024}  # this makes nice 10km/4mb chunks
+RAW_CHUNKS = {"time": 1, "X": 2048, "Y": 2048}  # this makes nice 8km/8mb chunks
 
 
 class CustomOptions(PipelineOptions):
@@ -185,7 +186,7 @@ def main(argv: list[str]) -> None:
         },
         getitem_kwargs={
             "max_retries": 10,
-            "initial_delay": 20000,  # increase the delay before retrying to respect pool size
+            "initial_delay": 60000,  # increase the delay before retrying to respect pool size
         },
     )
 
@@ -197,6 +198,7 @@ def main(argv: list[str]) -> None:
         """A shim overwrite to obtain chunks that intersect with the area of interest."""
         chunk_indices = [range(len(sizes)) for sizes in offsets.values()]
         count_skipped_aois = 0
+        processed_chunks = 0
         for indices in itertools.product(*chunk_indices):
             key_offsets = {
                 dim: offsets[dim][index] for dim, index in zip(offsets, indices, strict=False)
@@ -214,6 +216,10 @@ def main(argv: list[str]) -> None:
                     yield Key(key_offsets)
                 else:
                     yield Key(key_offsets, vars)
+                processed_chunks += 1
+                if processed_chunks % 10 == 0:
+                    print(f"Queued {processed_chunks} chunks for processing")
+                time.sleep(10)  # delay between chunks to respect rate limits
             else:
                 count_skipped_aois += 1
                 if count_skipped_aois % 100 == 0:
@@ -254,21 +260,28 @@ def main(argv: list[str]) -> None:
     print("~~~~ template ~~~~")
     print(template)
 
-    with beam.Pipeline(options=options) as root:
-        _ = (
-            root
-            # First pull in the dataset and write it to chunks
-            | ShimDatasetToChunks(
-                ds,
-                chunks=RAW_CHUNKS,
-                num_threads=main_options["ee_max_num_workers"],
+    try:
+        with beam.Pipeline(options=options) as root:
+            _ = (
+                root
+                # First pull in the dataset and write it to chunks
+                | ShimDatasetToChunks(
+                    ds,
+                    chunks=RAW_CHUNKS,
+                    num_threads=main_options["ee_max_num_workers"],
+                )
+                | xbeam.ChunksToZarr(
+                    custom_options.raw_archive,
+                    template=template,
+                    zarr_chunks=RAW_CHUNKS,
+                )
             )
-            | xbeam.ChunksToZarr(
-                custom_options.raw_archive,
-                template=template,
-                zarr_chunks=RAW_CHUNKS,
-            )
-        )
+    except Exception as e:
+        print(f"Pipeline failed with error: {e}")
+        import traceback
+
+        traceback.print_exc()
+        raise
 
 
 if __name__ == "__main__":
