@@ -68,8 +68,10 @@ export async function GET(req) {
     const url = new URL(req.url);
     const bandParam = url.searchParams.get("band") || "A20"; // fallback if not provided
     const areaParam = url.searchParams.get("area") || "budapest"; // default to budapest
-    const startParam = url.searchParams.get("start") || "2023-12-30"; // default start
-    const endParam = url.searchParams.get("end") || "2024-01-02"; // default end
+  // Default to a recent window (Sept 1 2025 → Oct 13 2025) which should be available
+  // Adjust these if you know the dataset coverage for your EE collection.
+  const startParam = url.searchParams.get("start") || "2025-09-01"; // default start
+  const endParam = url.searchParams.get("end") || "2025-10-13"; // default end
 
     const minParam = url.searchParams.get("min");
     const maxParam = url.searchParams.get("max");

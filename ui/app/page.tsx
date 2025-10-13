@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import proj4 from 'proj4';
 import { useEffect, useRef, useState, useMemo } from "react";
 import { send } from "process";
 
@@ -88,9 +89,16 @@ export default function EarthEmbeddings() {
   // New: selected area
   const [selectedArea, setSelectedArea] = useState(AREAS[0]); // default to first
 
-  // New: time window
-  const [startDate, setStartDate] = useState("2023-12-30");
-  const [endDate, setEndDate] = useState("2024-01-02");
+  // New: time window (default to a recent, valid period)
+  // Updated to 2025-09-01 → 2025-10-13 to reflect most-recent available data (as of Oct 13, 2025)
+  const [startDate, setStartDate] = useState("2025-09-01");
+  const [endDate, setEndDate] = useState("2025-10-13");
+
+  // New: data version (year)
+  const [selectedYear, setSelectedYear] = useState(2024);
+  const availableYears = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+  const [coordinateSystem, setCoordinateSystem] = useState<'geographic' | 'utm'>('geographic');
+  const [selectedZ, setSelectedZ] = useState<number | null>(null); // null = auto, number = manual
 
   // lightweight draw state
   // New: track if any polygon exists
@@ -224,11 +232,30 @@ export default function EarthEmbeddings() {
   // Map setup
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!;
+
     // Disable Mapbox telemetry
-    (mapboxgl.config as any).ENABLE_TELEMETRY = false;
+    // Note: Mapbox config properties are read-only, so we use localStorage and fetch override instead
     if (typeof window !== 'undefined') {
-      localStorage.setItem('mapbox:events:enabled', 'false');
+      try {
+        localStorage.setItem('mapbox:events:enabled', 'false');
+        localStorage.setItem('mapbox:performance:enabled', 'false');
+        // Disable all Mapbox telemetry
+        window.localStorage.setItem('mapbox:disable-telemetry', 'true');
+      } catch (e) {
+        // Ignore localStorage errors
+      }
     }
+
+    // Override fetch to block telemetry requests
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      if (typeof url === 'string' && url.includes('events.mapbox.com')) {
+        return Promise.resolve(new Response('', { status: 200 }));
+      }
+      return originalFetch.apply(this, args);
+    };
+
     const map = new mapboxgl.Map({
       container: mapIdDiv,
       zoom: selectedArea.zoom,
@@ -461,6 +488,29 @@ export default function EarthEmbeddings() {
   // If it's a MultiPolygon, send just the first polygon as a single Polygon
   const featureToSend: GeoJSON.Feature<GeoJSON.Polygon> = poly as GeoJSON.Feature<GeoJSON.Polygon>;
 
+  // Handle coordinate system conversion
+  let geometryToSend = featureToSend.geometry;
+  if (coordinateSystem === 'utm') {
+    // Convert from geographic (WGS84) to UTM Zone 33N
+    const utmProj = '+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs';
+    const wgs84Proj = '+proj=longlat +datum=WGS84 +no_defs';
+    
+    // Convert each coordinate in the polygon
+    const convertCoordinates = (coords: GeoJSON.Position[][]): GeoJSON.Position[][] => {
+      return coords.map(ring => 
+        ring.map(([lng, lat]) => {
+          const [easting, northing] = proj4(wgs84Proj, utmProj, [lng, lat]);
+          return [easting, northing];
+        })
+      );
+    };
+    
+    geometryToSend = {
+      ...geometryToSend,
+      coordinates: convertCoordinates(geometryToSend.coordinates)
+    };
+  }
+
   try {
     console.log("send k", currentK);
         const resp = await fetch(`http://${window.location.hostname}:8000/neighbours`, {
@@ -468,8 +518,11 @@ export default function EarthEmbeddings() {
       headers: { "Content-Type": "application/json" },
       // Send a SINGLE polygon feature
       body: JSON.stringify({
-        "geojson": featureToSend.geometry,
+        "geojson": geometryToSend,
         "k": currentK,
+        "year": selectedYear,
+        "coordinate_system": coordinateSystem,
+        "z": selectedZ,
       }),
     });
 
@@ -770,6 +823,80 @@ export default function EarthEmbeddings() {
                   style={numberInputStyle}
                 />
               </div>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ margin: 0, marginBottom: 8, fontSize: 14 }}>Data Version</h3>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                style={{
+                  background: "#111",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: 6,
+                  padding: "4px 8px",
+                  fontSize: 12,
+                  width: "100%",
+                }}
+              >
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>{year} Data</option>
+                ))}
+              </select>
+            </div>
+            
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ margin: 0, marginBottom: 8, fontSize: 14 }}>Zoom Level (z)</h3>
+              <select
+                value={selectedZ === null ? 'auto' : selectedZ.toString()}
+                onChange={(e) => setSelectedZ(e.target.value === 'auto' ? null : parseInt(e.target.value))}
+                style={{
+                  background: "#111",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: 6,
+                  padding: "4px 8px",
+                  fontSize: 12,
+                  width: "100%",
+                }}
+              >
+                <option value="auto">Auto (based on area)</option>
+                <option value="16">z16 (160m resolution)</option>
+                <option value="32">z32 (320m resolution)</option>
+                <option value="64">z64 (640m resolution)</option>
+                <option value="128">z128 (1280m resolution)</option>
+                <option value="256">z256 (2560m resolution)</option>
+              </select>
+              <p style={{ fontSize: 10, marginTop: 4, color: "#ccc" }}>
+                {selectedZ === null 
+                  ? "Automatically selects zoom level based on polygon area"
+                  : `Manually set to z${selectedZ} for ${Math.pow(2, selectedZ-8) * 10}m resolution`}
+              </p>
+            </div>
+            
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ margin: 0, marginBottom: 8, fontSize: 14 }}>Coordinate System</h3>
+              <select
+                value={coordinateSystem}
+                onChange={(e) => setCoordinateSystem(e.target.value as 'geographic' | 'utm')}
+                style={{
+                  background: "#111",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: 6,
+                  padding: "4px 8px",
+                  fontSize: 12,
+                  width: "100%",
+                }}
+              >
+                <option value="geographic">Geographic (Lat/Lon)</option>
+                <option value="utm">UTM Zone 33N</option>
+              </select>
+              <p style={{ fontSize: 10, marginTop: 4, color: "#ccc" }}>
+                {coordinateSystem === 'geographic' 
+                  ? "Use standard latitude/longitude coordinates"
+                  : "Use UTM Zone 33N coordinates (easting, northing)"}
+              </p>
             </div>
             <hr style={{ margin: "16px 0" }} />
       <p style={{ fontSize: 10, marginBottom: 8, textAlign: "justify" }}>

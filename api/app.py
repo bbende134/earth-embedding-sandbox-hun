@@ -99,26 +99,43 @@ class NeighbourQuery(BaseModel):
     geojson: dict
     k: int = Query(20, ge=1, le=200)
     nprobe: int = Query(32, le=64)
+    year: int = Query(2024, ge=2017, le=2030)
+    coordinate_system: str = Query("geographic", regex="^(geographic|utm)$")
+    z: int = Query(None, ge=8, le=256)  # Optional: manual zoom level override
 
 
-def _get_vector_for_latlon(col: Collection, x_c: float, y_c: float, z: int, scale: float = 100.0):
+def _get_vector_for_latlon(col: Collection, x_c: float, y_c: float, z: int, year: int, scale: float = 100.0):
     # Try get exactish match using the centroid and scale.
+    # Start with smaller scales for more precise matching
 
-    for s in [100.0, 1000.0, 10000.0, 100000.0]:  # try increasing scales
+    candidates = []
+    for s in [10.0, 50.0, 100.0, 500.0, 1000.0]:  # start smaller, increase gradually
         expr = (
             f"lon > {x_c - z * s / 2} and lon < {x_c + z * s / 2} and "
-            + f"lat > {y_c - z * s / 2} and lat < {y_c + z * s / 2} and z == {z}"
+            + f"lat > {y_c - z * s / 2} and lat < {y_c + z * s / 2} and z == {z} and year == {year}"
         )
         print(f"Query expr: {expr}")
         res = col.query(
-            expr=expr, output_fields=["lon", "lat", "z", "embedding"], limit=10
-        )  # get more
-        print(f"Query result: {len(res)} records")
+            expr=expr, output_fields=["lon", "lat", "z", "year", "embedding"], limit=20  # get more candidates
+        )
+        print(f"Query result: {len(res)} records at scale {s}")
+
+        # Collect all valid embeddings
         for r in res:
             emb = r["embedding"]
-            if any(e != 0 for e in emb):  # find first non-zero
-                return emb
-    return None  # if all zero or none
+            if emb and any(e != 0 for e in emb):  # valid non-zero embedding
+                # Calculate distance from centroid
+                dist = ((r["lon"] - x_c) ** 2 + (r["lat"] - y_c) ** 2) ** 0.5
+                candidates.append((emb, dist, r["lon"], r["lat"]))
+
+    if not candidates:
+        return None
+
+    # Sort by distance (closest first) and return the closest valid embedding
+    candidates.sort(key=lambda x: x[1])
+    closest_emb, closest_dist, closest_lon, closest_lat = candidates[0]
+    print(f"Selected embedding at distance {closest_dist:.6f} from centroid (lon={closest_lon:.6f}, lat={closest_lat:.6f})")
+    return closest_emb
 
 
 def which_z(query_area: float) -> int:
@@ -147,7 +164,7 @@ def reproject(geom, src_crs, dst_crs):
     return transform(transformer.transform, geom)
 
 
-@app.get("/healthz", dependencies=[Depends(rate_limiter(limit=10, window=60))])
+@app.get("/healthz", dependencies=[Depends(rate_limiter(limit=100, window=60))])
 def healthz():
     return {"ok": True}
 
@@ -155,7 +172,7 @@ def healthz():
 @app.post(
     "/neighbours",
     response_model=QueryResponse,
-    dependencies=[Depends(rate_limiter(limit=10, window=60))],
+    dependencies=[Depends(rate_limiter(limit=100, window=60))],
 )
 def neighbors(neighbour_query: NeighbourQuery):
     print("Neighbors function called")
@@ -175,24 +192,33 @@ def neighbors(neighbour_query: NeighbourQuery):
         logger.error(f"Error casting to geometry and getting area: {e}")
         raise HTTPException(status_code=400, detail=f"Error parsing GeoJSON: {e}")
 
-    query_z = which_z(query_area)
+    query_z = neighbour_query.z if neighbour_query.z is not None else which_z(query_area)
     if query_z == 0:
         raise HTTPException(status_code=400, detail="Query area is too small for any embeddings.")
 
-    logger.info(f"Query area: {query_area}, using z{query_z}")
+    logger.info(f"Query area: {query_area}, using z{query_z} {'(manual)' if neighbour_query.z is not None else '(auto)'}")
 
     connect()
     col = Collection(COLLECTION)
     col.load()
 
-    # get the shape centroid and then search +- z*10
-    shp_utm = reproject(shp, "EPSG:4326", TARGET_CRS)
-    shp_utm_centroid = shp_utm.centroid
+    # Handle coordinate system conversion
+    if neighbour_query.coordinate_system == "utm":
+        # Input is already in UTM, convert to geographic for centroid calculation
+        shp_geo = reproject(shp, TARGET_CRS, "EPSG:4326")
+        shp_geo_centroid = shp_geo.centroid
+        shp_utm_centroid = shp_geo_centroid  # Already in UTM space
+    else:
+        # Input is geographic, convert to UTM as before
+        shp_utm = reproject(shp, "EPSG:4326", TARGET_CRS)
+        shp_utm_centroid = shp_utm.centroid
+        shp_geo_centroid = reproject(shp_utm_centroid, TARGET_CRS, "EPSG:4326")
 
     print(f"Query centroid UTM: {shp_utm_centroid.x}, {shp_utm_centroid.y}, z={query_z}")
+    print(f"Query centroid Geo: {shp_geo_centroid.x}, {shp_geo_centroid.y}")
 
     vec = _get_vector_for_latlon(
-        col, shp_utm_centroid.x, shp_utm_centroid.y, query_z, scale=10000.0
+        col, shp_geo_centroid.x, shp_geo_centroid.y, query_z, neighbour_query.year, scale=10000.0
     )
     if vec is None:
         raise HTTPException(
@@ -200,32 +226,47 @@ def neighbors(neighbour_query: NeighbourQuery):
         )
 
     search_params = {"metric_type": METRIC_TYPE, "params": {"nprobe": neighbour_query.nprobe}}
+    # Filter by year AND zoom level in the search expression to search within the same resolution
+    expr = f"year == {neighbour_query.year} and z == {query_z}"
     hits = col.search(
         data=[vec],
         anns_field="embedding",
         param=search_params,
         limit=neighbour_query.k,
-        output_fields=["lon", "lat", "z", "embedding"],
+        expr=expr,
+        output_fields=["lon", "lat", "z", "year", "embedding"],
     )[0]
+
+    # If we don't get enough results at the same zoom level, try without zoom constraint
+    if len([h for h in hits if not any(e == 0 for e in h.entity.get("embedding", []))]) < neighbour_query.k:
+        print(f"DEBUG: Only {len(hits)} valid results at z={query_z}, trying cross-zoom search")
+        expr_fallback = f"year == {neighbour_query.year}"
+        hits = col.search(
+            data=[vec],
+            anns_field="embedding",
+            param=search_params,
+            limit=neighbour_query.k,
+            expr=expr_fallback,
+            output_fields=["lon", "lat", "z", "year", "embedding"],
+        )[0]
 
     features = []
     for h in hits:
         embedding = h.entity.get("embedding")
+        print(f"Processing hit with embedding: {embedding[:5]}..., year: {h.entity.get('year')}")
         # Skip if embedding is all zeros
         if not any(e != 0 for e in embedding):
+            print("Skipping zero embedding")
             continue
-        # reproject back to original CRS if needed
-        if TARGET_CRS != "EPSG:4326":
-            hit_pt = reproject(
-                geometry.Point(h.entity.get("lon"), h.entity.get("lat")), TARGET_CRS, "EPSG:4326"
-            )
-        else:
-            hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
+        # Coordinates are already in EPSG:4326 (lat/lon) from database
+        hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
         properties = {
             "z": h.entity.get("z"),
+            "year": h.entity.get("year"),
             "embedding": embedding,
             "distance": h.distance,
         }
+        print(f"Properties before Feature creation: {properties}")
         features.append(Feature(geometry=hit_pt, properties=properties))
 
     # If not enough non-zero embeddings, try with larger limit
@@ -236,25 +277,24 @@ def neighbors(neighbour_query: NeighbourQuery):
             anns_field="embedding",
             param=search_params,
             limit=larger_limit,
-            output_fields=["lon", "lat", "z", "embedding"],
+            expr=expr,
+            output_fields=["lon", "lat", "z", "year", "embedding"],
         )[0]
         for h in hits:
             embedding = h.entity.get("embedding")
+            print(f"Processing hit (second search) with embedding: {embedding[:5]}..., year: {h.entity.get('year')}")
             if not any(e != 0 for e in embedding):
+                print("Skipping zero embedding (second search)")
                 continue
-            if TARGET_CRS != "EPSG:4326":
-                hit_pt = reproject(
-                    geometry.Point(h.entity.get("lon"), h.entity.get("lat")),
-                    TARGET_CRS,
-                    "EPSG:4326",
-                )
-            else:
-                hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
+            # Coordinates are already in EPSG:4326 (lat/lon) from database
+            hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
             properties = {
                 "z": h.entity.get("z"),
+                "year": h.entity.get("year"),
                 "embedding": embedding,
                 "distance": h.distance,
             }
+            print(f"Properties before Feature creation (second search): {properties}")
             features.append(Feature(geometry=hit_pt, properties=properties))
             if len(features) >= neighbour_query.k:
                 break
@@ -264,7 +304,27 @@ def neighbors(neighbour_query: NeighbourQuery):
     return QueryResponse(
         neighbours=featurecollection,
         query_embedding=vec,
-        query_lat=shp_utm_centroid.y,
-        query_lon=shp_utm_centroid.x,
+        query_lat=shp_geo_centroid.y,
+        query_lon=shp_geo_centroid.x,
         query_z=query_z,
     )
+
+
+@app.get("/years", dependencies=[Depends(rate_limiter(limit=100, window=60))])
+def get_available_years():
+    """Get list of available years in the database"""
+    connect()
+    col = Collection(COLLECTION)
+    col.load()
+    
+    # Get all unique years
+    years_result = col.query(
+        expr='',
+        output_fields=['year'],
+        limit=10000  # Should be enough to get all unique years
+    )
+    
+    unique_years = list(set(entity['year'] for entity in years_result))
+    unique_years.sort(reverse=True)  # Most recent first
+    
+    return {"years": unique_years}
