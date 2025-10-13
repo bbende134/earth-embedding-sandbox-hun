@@ -1,7 +1,6 @@
 import logging
 import os
 
-import fsspec
 import numpy as np
 import xarray as xr
 from dask.array.core import slices_from_chunks
@@ -29,8 +28,12 @@ def ensure_collection():
         schema = col.schema
         field_names = [f.name for f in schema.fields]
         if "year" not in field_names:
-            print("Schema missing 'year' field. Collection needs to be recreated, but keeping existing data.")
-            print("Please manually drop and recreate the collection if you want to add the year field.")
+            print(
+                "Schema missing 'year' field. Collection needs to be recreated, but keeping existing data."
+            )
+            print(
+                "Please manually drop and recreate the collection if you want to add the year field."
+            )
             # Don't drop automatically - let user decide
             return col
         else:
@@ -46,7 +49,9 @@ def ensure_collection():
         FieldSchema(name="year", dtype=DataType.INT16),  # New: year of the data (e.g., 2024)
         FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=EMB_DIM),
     ]
-    schema = CollectionSchema(fields, description="64D climate/sat embeddings keyed by z/lat/lon/year")
+    schema = CollectionSchema(
+        fields, description="64D climate/sat embeddings keyed by z/lat/lon/year"
+    )
     col = Collection(name=COLLECTION, schema=schema)
 
     # Default IVF_FLAT index
@@ -66,7 +71,7 @@ def gcsfs():
     # Set up GCS filesystem with authentication
     import gcsfs
     from google.oauth2 import service_account
-    
+
     credentials = service_account.Credentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"],
         scopes=["https://www.googleapis.com/auth/devstorage.read_write"],
@@ -93,54 +98,65 @@ def reshape(block, z, year):
     print(f"Before dropna: {len(df)} records, has na: {df.isna().any().any()}")
     df = df.dropna()
     print(f"After dropna: {len(df)} records")
-    
+
     # Extract X and Y coordinates from the xy index
     df = df.reset_index()
-    if 'xy' in df.columns:
+    if "xy" in df.columns:
         # xy column contains tuples of (X, Y)
         import pandas as pd
-        df[['X', 'Y']] = df['xy'].apply(lambda x: pd.Series([x[0], x[1]] if isinstance(x, tuple) else [x, x]))
-        df = df.drop('xy', axis=1)
-    
+
+        df[["X", "Y"]] = df["xy"].apply(
+            lambda x: pd.Series([x[0], x[1]] if isinstance(x, tuple) else [x, x])
+        )
+        df = df.drop("xy", axis=1)
+
     print(f"Columns after reset_index: {list(df.columns)}")
-    print(f"Sample X,Y values: X={df['X'].iloc[0] if 'X' in df.columns else 'N/A'}, Y={df['Y'].iloc[0] if 'Y' in df.columns else 'N/A'}")
-    
+    print(
+        f"Sample X,Y values: X={df['X'].iloc[0] if 'X' in df.columns else 'N/A'}, Y={df['Y'].iloc[0] if 'Y' in df.columns else 'N/A'}"
+    )
+
     # Convert UTM coordinates to lat/lon
     try:
         import pyproj
+
         transformer = pyproj.Transformer.from_crs("EPSG:32633", "EPSG:4326", always_xy=True)
         # Filter out any NaN or invalid coordinates
         valid_mask = ~(df["X"].isna() | df["Y"].isna())
         if valid_mask.sum() == 0:
             print("No valid coordinates to transform")
             return []
-        
+
         valid_x = df.loc[valid_mask, "X"].values
         valid_y = df.loc[valid_mask, "Y"].values
         lon_vals, lat_vals = transformer.transform(valid_x, valid_y)
-        
+
         df.loc[valid_mask, "lon"] = lon_vals
         df.loc[valid_mask, "lat"] = lat_vals
-        
+
         # Remove rows with invalid coordinates
         df = df[valid_mask].copy()
         print(f"After coordinate transformation: {len(df)} records")
     except Exception as e:
         print(f"Error in coordinate transformation: {e}")
         import traceback
+
         traceback.print_exc()
         # Fallback: keep original coordinates (though they will be wrong)
         df["lon"] = df["X"]
         df["lat"] = df["Y"]
-    
+
     # Extract features into embedding array
-    feature_cols = [col for col in df.columns if isinstance(col, int) or (isinstance(col, str) and col.isdigit())]
+    feature_cols = [
+        col
+        for col in df.columns
+        if isinstance(col, int) or (isinstance(col, str) and col.isdigit())
+    ]
     df["embedding"] = df[feature_cols].values.tolist()
     df["embedding"] = df["embedding"].apply(lambda x: np.asarray(x, dtype=np.float32, order="C"))
-    
+
     # Keep only the columns we need for Milvus
     df = df[["lat", "lon", "embedding"]].copy()
-    
+
     print(f"Reshaped {len(df)} records for z={z}, year={year}")
     df["z"] = z
     df["year"] = year
@@ -158,9 +174,12 @@ def main():
 
     # Get all processed areas
     import glob
-    processed_geojsons = glob.glob(os.path.join(os.path.dirname(__file__), "../processed/*.geojson"))
-    processed_areas = [os.path.basename(f).replace('.geojson', '') for f in processed_geojsons]
-    
+
+    processed_geojsons = glob.glob(
+        os.path.join(os.path.dirname(__file__), "../processed/*.geojson")
+    )
+    processed_areas = [os.path.basename(f).replace(".geojson", "") for f in processed_geojsons]
+
     print(f"Found {len(processed_areas)} processed areas to load")
 
     # Get years from environment or use default
@@ -172,7 +191,7 @@ def main():
     for area in processed_areas:
         for year in years:
             area_archive = f"gs://earth-embeddings-hungary-output/{area}_{year}_embeddings"
-            
+
             # Check if this specific area/year archive exists before trying to load it
             try:
                 fs = gcsfs()
@@ -183,20 +202,23 @@ def main():
             except Exception as e:
                 logger.warning(f"Could not check if archive exists for {area}_{year}: {e}")
                 continue
-            
+
             logger.info(f"Loading area: {area} for year {year} from {area_archive}")
-            
+
             for level in ZOOM_PYRAMID_LEVELS:
                 try:
                     # Use authenticated GCS filesystem
                     store = fs.get_mapper(area_archive + f"_z{level}")
                     zx = xr.open_zarr(store)
                     logger.info(f"doing zoom level {level} for {area} year {year}")
-                    
+
                     # Use the year from the loop since we know it
                     logger.info(f"Using year {year} from archive name")
 
-                    for sl_tuple in tqdm(list(slices_from_chunks(zx["embeddings"].data.chunks)), desc=f"{area} z{level}"):
+                    for sl_tuple in tqdm(
+                        list(slices_from_chunks(zx["embeddings"].data.chunks)),
+                        desc=f"{area} z{level}",
+                    ):
                         isel_dict = dict(zip(zx["embeddings"].dims, sl_tuple, strict=False))
                         # check intersection with geometry before bothering to insert
                         records += reshape(zx["embeddings"].isel(isel_dict), z=level, year=year)
@@ -207,7 +229,9 @@ def main():
                             col.flush()
                             records = []
                 except FileNotFoundError:
-                    logger.warning(f"Zoom level {level} not found for {area} year {year} (area may be too small), skipping")
+                    logger.warning(
+                        f"Zoom level {level} not found for {area} year {year} (area may be too small), skipping"
+                    )
                     continue
                 except Exception as e:
                     logger.warning(f"Could not load {area} year {year} z{level}: {e}")

@@ -12,27 +12,6 @@
 # - so a better solution seems to be limiting the total job size, so batches are smaller, and flow properly through the pipeline
 
 
-import logging
-import os
-import time
-from collections.abc import Iterator, Mapping, Sequence
-from typing import AbstractSet
-
-# from absl import flags
-import apache_beam as beam
-import ee
-import pyproj
-import xarray as xr
-import xarray_beam as xbeam
-from apache_beam.options.pipeline_options import PipelineOptions
-from shapely import geometry
-from shapely.geometry import shape
-from shapely.ops import transform
-from xarray_beam._src import core as xbeam_core
-from xarray_beam._src import threadmap
-from xarray_beam._src.core import Key
-from xee import EarthEngineBackendEntrypoint
-
 import itertools
 import json
 import logging
@@ -55,6 +34,8 @@ from xarray_beam._src import core as xbeam_core
 from xarray_beam._src import threadmap
 from xarray_beam._src.core import Key
 from xee import EarthEngineBackendEntrypoint
+
+# from absl import flags
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -103,9 +84,7 @@ class CustomOptions(PipelineOptions):
             required=True,
             help="End date for filtering (YYYY-MM-DD).",
         )
-        parser.add_argument(
-            "--raw_archive", type=str, required=True, help="The output zarr path."
-        )
+        parser.add_argument("--raw_archive", type=str, required=True, help="The output zarr path.")
 
 
 def clean_and_parse_utm_zone(espg_str: str) -> str:

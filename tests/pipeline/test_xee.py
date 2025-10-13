@@ -36,7 +36,7 @@ def test_clip_small_dataset(ee_initialize):
 
     ic = (
         ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL")
-    .filterDate(ee.Date("2025-09-01"), ee.Date("2025-10-13"))
+        .filterDate(ee.Date("2025-09-01"), ee.Date("2025-10-13"))
         .filterBounds(aoi_ee)
         .select(["A20", "A01"])
         .mosaic()

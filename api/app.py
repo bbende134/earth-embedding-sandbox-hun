@@ -59,11 +59,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-origins = [
-    "http://localhost:3000",
-    "http://192.168.1.72:3000",
-    "https://100.123.97.11:3000"
-]
+origins = ["http://localhost:3000", "http://192.168.1.72:3000", "https://100.123.97.11:3000"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -104,7 +100,9 @@ class NeighbourQuery(BaseModel):
     z: int = Query(None, ge=8, le=256)  # Optional: manual zoom level override
 
 
-def _get_vector_for_latlon(col: Collection, x_c: float, y_c: float, z: int, year: int, scale: float = 100.0):
+def _get_vector_for_latlon(
+    col: Collection, x_c: float, y_c: float, z: int, year: int, scale: float = 100.0
+):
     # Try get exactish match using the centroid and scale.
     # Start with smaller scales for more precise matching
 
@@ -116,7 +114,9 @@ def _get_vector_for_latlon(col: Collection, x_c: float, y_c: float, z: int, year
         )
         print(f"Query expr: {expr}")
         res = col.query(
-            expr=expr, output_fields=["lon", "lat", "z", "year", "embedding"], limit=20  # get more candidates
+            expr=expr,
+            output_fields=["lon", "lat", "z", "year", "embedding"],
+            limit=20,  # get more candidates
         )
         print(f"Query result: {len(res)} records at scale {s}")
 
@@ -134,7 +134,9 @@ def _get_vector_for_latlon(col: Collection, x_c: float, y_c: float, z: int, year
     # Sort by distance (closest first) and return the closest valid embedding
     candidates.sort(key=lambda x: x[1])
     closest_emb, closest_dist, closest_lon, closest_lat = candidates[0]
-    print(f"Selected embedding at distance {closest_dist:.6f} from centroid (lon={closest_lon:.6f}, lat={closest_lat:.6f})")
+    print(
+        f"Selected embedding at distance {closest_dist:.6f} from centroid (lon={closest_lon:.6f}, lat={closest_lat:.6f})"
+    )
     return closest_emb
 
 
@@ -196,7 +198,9 @@ def neighbors(neighbour_query: NeighbourQuery):
     if query_z == 0:
         raise HTTPException(status_code=400, detail="Query area is too small for any embeddings.")
 
-    logger.info(f"Query area: {query_area}, using z{query_z} {'(manual)' if neighbour_query.z is not None else '(auto)'}")
+    logger.info(
+        f"Query area: {query_area}, using z{query_z} {'(manual)' if neighbour_query.z is not None else '(auto)'}"
+    )
 
     connect()
     col = Collection(COLLECTION)
@@ -238,7 +242,10 @@ def neighbors(neighbour_query: NeighbourQuery):
     )[0]
 
     # If we don't get enough results at the same zoom level, try without zoom constraint
-    if len([h for h in hits if not any(e == 0 for e in h.entity.get("embedding", []))]) < neighbour_query.k:
+    if (
+        len([h for h in hits if not any(e == 0 for e in h.entity.get("embedding", []))])
+        < neighbour_query.k
+    ):
         print(f"DEBUG: Only {len(hits)} valid results at z={query_z}, trying cross-zoom search")
         expr_fallback = f"year == {neighbour_query.year}"
         hits = col.search(
@@ -282,7 +289,9 @@ def neighbors(neighbour_query: NeighbourQuery):
         )[0]
         for h in hits:
             embedding = h.entity.get("embedding")
-            print(f"Processing hit (second search) with embedding: {embedding[:5]}..., year: {h.entity.get('year')}")
+            print(
+                f"Processing hit (second search) with embedding: {embedding[:5]}..., year: {h.entity.get('year')}"
+            )
             if not any(e != 0 for e in embedding):
                 print("Skipping zero embedding (second search)")
                 continue
@@ -316,15 +325,15 @@ def get_available_years():
     connect()
     col = Collection(COLLECTION)
     col.load()
-    
+
     # Get all unique years
     years_result = col.query(
-        expr='',
-        output_fields=['year'],
-        limit=10000  # Should be enough to get all unique years
+        expr="",
+        output_fields=["year"],
+        limit=10000,  # Should be enough to get all unique years
     )
-    
-    unique_years = list(set(entity['year'] for entity in years_result))
+
+    unique_years = list(set(entity["year"] for entity in years_result))
     unique_years.sort(reverse=True)  # Most recent first
-    
+
     return {"years": unique_years}
