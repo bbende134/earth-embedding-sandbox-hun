@@ -8,7 +8,7 @@ PROJECT="86493264147"
 
 # Set credentials
 export GOOGLE_APPLICATION_CREDENTIALS="/home/barczabende/dev/earth-embedding-sandbox-hun/gen-lang-client-0291927848-14f8e1a428bd.json"
-export HV_URL="https://earthengine.googleapis.com"
+export HV_URL="https://earthengine-highvolume.googleapis.com"
 
 for area in "${AREAS[@]}"; do
   echo "Processing $area"
@@ -25,7 +25,7 @@ for area in "${AREAS[@]}"; do
     --ee_max_num_workers 1 \
     --direct_num_workers 1
 
-  echo "Sleeping 60 seconds before next step..."
+  echo "next step..."
   sleep 60
 
   # Step 2: Consolidate
@@ -61,10 +61,20 @@ for area in "${AREAS[@]}"; do
 
   echo "Completed processing $area"
 
-  # Ask to continue
-  read -p "Continue to next area? (y/n): " choice
-  if [ "$choice" != "y" ]; then
-    echo "Stopping processing."
+  # Test the data
+  echo "Testing data for $area"
+  geojson=$(cat small_areas/${area}.geojson)
+  response=$(curl -s -X POST http://localhost:8000/neighbours -H "Content-Type: application/json" -d "{\"geojson\": $geojson, \"k\": 5}")
+  if [ $? -ne 0 ]; then
+    echo "Curl failed for $area, stopping processing."
+    break
+  fi
+  # Check if response has neighbours with features
+  if echo "$response" | jq -e '.neighbours.features | length > 0' > /dev/null 2>&1; then
+    echo "Data found for $area, moving to processed folder."
+    mv small_areas/${area}.geojson processed/
+  else
+    echo "No valid data found for $area (empty or all-zero embeddings), stopping processing."
     break
   fi
 done

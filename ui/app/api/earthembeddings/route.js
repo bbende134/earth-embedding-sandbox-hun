@@ -65,14 +65,9 @@ export async function GET(req) {
     await authenticate(key);
     console.log('Earth Engine authentication successful');
 
-    // Read geojson from file
-    const geojsonPath = '/home/barczabende/dev/earth-embedding-sandbox-hun/budapest.geojson';
-    console.log('GeoJSON path:', geojsonPath);
-    const gj = JSON.parse(fs.readFileSync(geojsonPath, 'utf8'));
-    console.log('GeoJSON loaded successfully');
-
     const url = new URL(req.url);
     const bandParam = url.searchParams.get("band") || "A20"; // fallback if not provided
+    const areaParam = url.searchParams.get("area") || "budapest"; // default to budapest
 
     const minParam = url.searchParams.get("min");
     const maxParam = url.searchParams.get("max");
@@ -100,6 +95,12 @@ export async function GET(req) {
 
     const minValues = mins ?? Array(bands.length).fill(-1);
     const maxValues = maxs ?? Array(bands.length).fill(1);
+
+    // Read geojson from file based on area
+    const geojsonPath = `/home/barczabende/dev/earth-embedding-sandbox-hun/${areaParam}.geojson`;
+    console.log('GeoJSON path:', geojsonPath);
+    const gj = JSON.parse(fs.readFileSync(geojsonPath, 'utf8'));
+    console.log('GeoJSON loaded successfully');
 
     // Image collection of sentinel-2
     const col = ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL");

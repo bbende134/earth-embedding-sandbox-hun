@@ -260,6 +260,11 @@ def main(argv: list[str]) -> None:
     print("~~~~ template ~~~~")
     print(template)
 
+    # Make zarr_chunks adaptive to data size
+    adaptive_zarr_chunks = {}
+    for dim in ds.sizes:
+        adaptive_zarr_chunks[dim] = ds.sizes[dim]
+
     try:
         with beam.Pipeline(options=options) as root:
             _ = (
@@ -273,7 +278,7 @@ def main(argv: list[str]) -> None:
                 | xbeam.ChunksToZarr(
                     custom_options.raw_archive,
                     template=template,
-                    zarr_chunks=RAW_CHUNKS,
+                    zarr_chunks=adaptive_zarr_chunks,
                 )
             )
     except Exception as e:

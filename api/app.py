@@ -62,10 +62,11 @@ app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:3000",
     "http://192.168.1.72:3000",
+    "https://100.123.97.11:3000"
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -158,8 +159,11 @@ def healthz():
 )
 def neighbors(neighbour_query: NeighbourQuery):
     print("Neighbors function called")
+    geojson = neighbour_query.geojson
+    if geojson.get("type") == "Feature":
+        geojson = geojson["geometry"]
     try:
-        polygon = Polygon(**neighbour_query.geojson)
+        polygon = Polygon(**geojson)
     except Exception as e:
         logger.error(f"Invalid GeoJSON: {e}")
         raise HTTPException(status_code=400, detail=f"Invalid GeoJSON: {e}")

@@ -178,3 +178,5 @@ write.lock
 
 *milvus*
 *minio*
+
+*.geojson

@@ -17,6 +17,13 @@ const RESULT_SOURCE_ID = "server-result";
 const RESULT_FILL_ID = "server-result-fill";
 const RESULT_LINE_ID = "server-result-line";
 
+// Define available areas
+const AREAS = [
+  { name: "Budapest", file: "budapest", center: [19.0402, 47.4979], zoom: 10 },
+  { name: "Hungary", file: "hungary", center: [19.0402, 47.4979], zoom: 7 },
+  { name: "Northwest Hungary 0", file: "processed/northwest_hungary_0", center: [16.7, 47.7], zoom: 12 },
+];
+
 
 
 function PillSwitch({ checked, onChange }: { checked: boolean; onChange: () => void }) {
@@ -78,6 +85,9 @@ export default function EarthEmbeddings() {
   const [visualizationMode, setVisualizationMode] = useState<'points' | 'polygons'>('points');
   const [lastResult, setLastResult] = useState<GeoJSON.FeatureCollection>({ type: 'FeatureCollection', features: [] });
 
+  // New: selected area
+  const [selectedArea, setSelectedArea] = useState(AREAS[0]); // default to first
+
   // lightweight draw state
   // New: track if any polygon exists
   const [hasPolygon, setHasPolygon] = useState(false);
@@ -116,7 +126,7 @@ export default function EarthEmbeddings() {
     const maxQuery = maxValues.join(",");
 
     const res = await fetch(
-      `/api/earthembeddings?band=${bandQuery}&min=${minQuery}&max=${maxQuery}`
+      `/api/earthembeddings?band=${bandQuery}&min=${minQuery}&max=${maxQuery}&area=${selectedArea.file}`
     );
 
     const { urlFormat, message } = await res.json();
@@ -217,8 +227,8 @@ export default function EarthEmbeddings() {
     }
     const map = new mapboxgl.Map({
       container: mapIdDiv,
-      zoom: 7,
-      center: [19.0402, 47.4979], // Budapest coordinates
+      zoom: selectedArea.zoom,
+      center: selectedArea.center as [number, number],
       style: "mapbox://styles/mapbox/standard-satellite",
     });
     mapRef.current = map;
@@ -323,7 +333,15 @@ export default function EarthEmbeddings() {
       fetchAndRenderLayer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bands, minValues, maxValues]);
+  }, [bands, minValues, maxValues, selectedArea]);
+
+  // Update map center and zoom when area changes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.setCenter(selectedArea.center as [number, number]);
+    map.setZoom(selectedArea.zoom);
+  }, [selectedArea]);
 
   // Toggle EE layer visibility
   useEffect(() => {
@@ -522,10 +540,36 @@ export default function EarthEmbeddings() {
             </p>
 
             <p style={{ fontSize: 11, marginBottom: 8, textAlign: "justify" }}>
-              AlphaEarth Foundations is licenced under CC-BY-4.0; it is a dataset produced by Google and Google Deepmind. It is available from <a style={{color: "cyan"}} href="https://earthengine.google.com/alphaearth/">Google Earth Engine</a>.
+              AlphaEarth Foundations is licenced under CC-BY-4.0; it is a dataset produced by Google and Google Deepmind. It is available from <a style={{ color: "cyan" }} href="https://earthengine.google.com/alphaearth/">Google Earth Engine</a>.
             </p>
 
             
+
+            <hr style={{ margin: "8px 0" }} />
+            <h2 style={{ margin: 0, marginBottom: 8, fontSize: 14 }}>Area Selection</h2>
+            <div style={{ marginTop: 8 }}>
+              <label style={{ display: "block", marginBottom: 4 }}>Select Area</label>
+              <select
+                value={selectedArea.file}
+                onChange={(e) => {
+                  const area = AREAS.find(a => a.file === e.target.value);
+                  if (area) setSelectedArea(area);
+                }}
+                style={{
+                  background: "#111",
+                  color: "#fff",
+                  border: "1px solid #444",
+                  borderRadius: 6,
+                  padding: "4px 8px",
+                  fontSize: 12,
+                  width: "100%",
+                }}
+              >
+                {AREAS.map((area) => (
+                  <option key={area.file} value={area.file}>{area.name}</option>
+                ))}
+              </select>
+            </div>
 
             <hr style={{ margin: "8px 0" }} />
             <h2 style={{ margin: 0, marginBottom: 8, fontSize: 14 }}>Visualization Controls</h2>

@@ -30,9 +30,9 @@ dask.config.set(scheduler="synchronous")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024}
-RAW_CHUNKS_WITH_FEATURES = {"features": 1, "time": 1, "X": 1024, "Y": 1024}
-STACKED_CHUNKS = {"features": -1, "time": 1, "X": 1024, "Y": 1024}
+RAW_CHUNKS = {"time": 1, "X": 256, "Y": 256}
+RAW_CHUNKS_WITH_FEATURES = {"features": 1, "time": 1, "X": 256, "Y": 256}
+STACKED_CHUNKS = {"features": -1, "time": 1, "X": 256, "Y": 256}
 FINAL_CHUNKS = {"features": -1, "time": 1, "X": 64, "Y": 64}
 ITEMSIZE = 4  # 1 variable x 4 bytes (float32)
 
@@ -143,6 +143,15 @@ def main(argv: list[str]) -> None:
             source_chunks = RAW_CHUNKS
         else:
             ds_on_disk, source_chunks = xbeam.open_zarr(custom_options.raw_archive)
+            # Make chunking adaptive to data size
+            adaptive_chunks = {}
+            for dim in ds_on_disk.sizes:
+                if dim in RAW_CHUNKS:
+                    adaptive_chunks[dim] = min(RAW_CHUNKS[dim], ds_on_disk.sizes[dim])
+                else:
+                    adaptive_chunks[dim] = ds_on_disk.sizes[dim]
+            source_chunks = adaptive_chunks
+            ds_on_disk = ds_on_disk.chunk(source_chunks)
 
     elif custom_options.raw_archives:
         if custom_options.merge_only and not custom_options.intermediate_archive:
@@ -164,6 +173,15 @@ def main(argv: list[str]) -> None:
         else:
             ds_on_disk = xr.merge([xr.open_zarr(archive) for archive in archives])
         source_chunks = RAW_CHUNKS
+        # Make chunking adaptive to data size
+        adaptive_chunks = {}
+        for dim in ds_on_disk.sizes:
+            if dim in RAW_CHUNKS:
+                adaptive_chunks[dim] = min(RAW_CHUNKS[dim], ds_on_disk.sizes[dim])
+            else:
+                adaptive_chunks[dim] = ds_on_disk.sizes[dim]
+        source_chunks = adaptive_chunks
+        ds_on_disk = ds_on_disk.chunk(source_chunks)
 
     template = xbeam.make_template(ds_on_disk)
 

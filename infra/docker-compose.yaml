@@ -73,6 +73,8 @@ services:
     container_name: geo-sim-api
     env_file:
       - ../.env
+    volumes:
+      - ..:/app/host
     depends_on:
       standalone:
         condition: service_healthy
