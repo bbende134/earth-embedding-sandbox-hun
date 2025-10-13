@@ -5,7 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { send } from "process";
 
 const BAND_OPTIONS = Array.from({ length: 64 }, (_, i) => `A${i.toString().padStart(2, "0")}`);
@@ -88,6 +88,10 @@ export default function EarthEmbeddings() {
   // New: selected area
   const [selectedArea, setSelectedArea] = useState(AREAS[0]); // default to first
 
+  // New: time window
+  const [startDate, setStartDate] = useState("2023-12-30");
+  const [endDate, setEndDate] = useState("2024-01-02");
+
   // lightweight draw state
   // New: track if any polygon exists
   const [hasPolygon, setHasPolygon] = useState(false);
@@ -126,7 +130,7 @@ export default function EarthEmbeddings() {
     const maxQuery = maxValues.join(",");
 
     const res = await fetch(
-      `/api/earthembeddings?band=${bandQuery}&min=${minQuery}&max=${maxQuery}&area=${selectedArea.file}`
+      `/api/earthembeddings?band=${bandQuery}&min=${minQuery}&max=${maxQuery}&area=${selectedArea.file}&start=${startDate}&end=${endDate}`
     );
 
     const { urlFormat, message } = await res.json();
@@ -327,13 +331,18 @@ export default function EarthEmbeddings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Memoize dependency strings to prevent unnecessary re-renders
+  const bandString = useMemo(() => bands.join(','), [bands]);
+  const minString = useMemo(() => minValues.join(','), [minValues]);
+  const maxString = useMemo(() => maxValues.join(','), [maxValues]);
+
   // Re-render EE layer when params change and style is ready
   useEffect(() => {
     if (mapRef.current?.isStyleLoaded()) {
       fetchAndRenderLayer();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bands, minValues, maxValues, selectedArea]);
+  }, [bandString, minString, maxString, selectedArea.file, startDate, endDate]);
 
   // Update map center and zoom when area changes
   useEffect(() => {
@@ -573,6 +582,47 @@ export default function EarthEmbeddings() {
 
             <hr style={{ margin: "8px 0" }} />
             <h2 style={{ margin: 0, marginBottom: 8, fontSize: 14 }}>Visualization Controls</h2>
+
+            {/* Time Window */}
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ margin: 0, marginBottom: 8 }}>Time Window</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div>
+                  <label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>Start Date</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    style={{
+                      background: "#111",
+                      color: "#fff",
+                      border: "1px solid #444",
+                      borderRadius: 6,
+                      padding: "4px 8px",
+                      fontSize: 12,
+                      width: "100%",
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", marginBottom: 4, fontSize: 12 }}>End Date</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    style={{
+                      background: "#111",
+                      color: "#fff",
+                      border: "1px solid #444",
+                      borderRadius: 6,
+                      padding: "4px 8px",
+                      fontSize: 12,
+                      width: "100%",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
 
             {/* 1) EE layer toggle */}
             <div style={{ marginTop: 16 }}>

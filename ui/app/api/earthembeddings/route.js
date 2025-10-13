@@ -68,6 +68,8 @@ export async function GET(req) {
     const url = new URL(req.url);
     const bandParam = url.searchParams.get("band") || "A20"; // fallback if not provided
     const areaParam = url.searchParams.get("area") || "budapest"; // default to budapest
+    const startParam = url.searchParams.get("start") || "2023-12-30"; // default start
+    const endParam = url.searchParams.get("end") || "2024-01-02"; // default end
 
     const minParam = url.searchParams.get("min");
     const maxParam = url.searchParams.get("max");
@@ -124,8 +126,8 @@ export async function GET(req) {
     const geometry = ee.Geometry(gj.geometry);
 
     // Range of date for filter
-    const start = "2023-12-30";
-    const end = "2024-01-02";
+    const start = startParam;
+    const end = endParam;
 
     // Filter by date and bounds
     const filtered = col.filterDate(start, end).filterBounds(geometry).select(bands)//.filter(ee.Filter.eq("UTM_ZONE","30N"));
