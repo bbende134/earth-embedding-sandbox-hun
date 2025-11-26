@@ -21,6 +21,14 @@ dependencies = [
     "redis==5.3.1",
     "geojson-pydantic==2.0.0",
     "pymilvus>=2.5.16",
+    "shapely>=2.1.2",
+    "geemap>=0.36.5",
+    "rioxarray>=0.20.0",
+    "google-api-python-client>=2.184.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.2",
+    "python-dotenv>=1.0.1",
+    "scipy>=1.16.3",
 ]
 
 [project.optional-dependencies]
@@ -106,4 +114,11 @@ log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(linen
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 markers = [
     "interactive: marks tests as requiring manual/interactive execution"
+]
+
+[dependency-groups]
+dev = [
+    "geopandas>=1.1.1",
+    "ipykernel>=7.1.0",
+    "matplotlib>=3.10.7",
 ]

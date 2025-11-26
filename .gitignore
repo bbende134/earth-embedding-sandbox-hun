@@ -174,9 +174,21 @@ gen-lang-client-029*
 
 write.lock
 *.meta
-*zarr*
+*.zarr
 
 *milvus*
 *minio*
 
 *.geojson
+
+*.png
+
+/infra
+
+client_secret_86493264147-n92v0iudi0s3e817kl7q2vrhmtrncihf.apps.googleusercontent.com.json
+token.json
+credentials.json
+*.tif
+*.tiff
+
+/processed_hun

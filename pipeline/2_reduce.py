@@ -89,6 +89,7 @@ def main(argv: list[str]) -> None:
         fs = gcsfs.GCSFileSystem(token=credentials)
         store = fs.get_mapper(custom_options.reduced_archive + "_z8")
         ds_on_disk = xr.open_zarr(store, chunks=None)
+        template_ds = ds_on_disk
         source_chunks = {}
         for dim in ds_on_disk.dims:
             if dim in ds_on_disk.chunks:
@@ -96,14 +97,38 @@ def main(argv: list[str]) -> None:
             else:
                 source_chunks[dim] = ds_on_disk.sizes[dim]
     else:
-        ds_on_disk, source_chunks = xbeam.open_zarr(custom_options.reduced_archive + "_z8")
+        # Avoid xbeam.open_zarr as it creates LazyArrays which can cause issues with templates
+        ds_on_disk = xr.open_zarr(custom_options.reduced_archive + "_z8")
 
-    templates = {"z8": xbeam.make_template(ds_on_disk)}
+        # Load coordinates into memory to avoid LazyArray issues in templates
+        # and drop spatial_ref if present
+        if "spatial_ref" in ds_on_disk.coords:
+            ds_on_disk = ds_on_disk.drop_vars("spatial_ref")
+        if "spatial_ref" in ds_on_disk.data_vars:
+            ds_on_disk = ds_on_disk.drop_vars("spatial_ref")
+
+        for coord in ds_on_disk.coords:
+            try:
+                ds_on_disk[coord].load()
+            except Exception:
+                this
+
+        source_chunks = {}
+        for dim in ds_on_disk.dims:
+            if dim in ds_on_disk.chunks:
+                source_chunks[dim] = ds_on_disk.chunks[dim][0]
+            else:
+                source_chunks[dim] = ds_on_disk.sizes[dim]
+
+        template_ds = ds_on_disk
+
+    # Use the dataset with computable coordinates as the template base
+    templates = {"z8": template_ds}
 
     for zoom_block in ZOOM_BLOCKS[1:]:
         templates[f"z{zoom_block}"] = (
             templates["z8"]
-            .coarsen(X=int(zoom_block / 8), Y=int(zoom_block / 8), boundary="trim")
+            .coarsen(X=int(zoom_block / 8), Y=int(zoom_block / 8), boundary="pad")
             .mean(skipna=True)
         )
 
@@ -124,9 +149,15 @@ def main(argv: list[str]) -> None:
 
         results = []
         for size in [16, 32, 64, 128, 256]:
+            # Check if template is valid (non-empty)
+            tpl = templates[f"z{size}"]
+            if any(s == 0 for s in tpl.sizes.values()):
+                logger.warning(f"Skipping z{size} because it has empty dimensions: {tpl.sizes}")
+                continue
+
             branch = (
                 base
-                | f"bm{size}" >> BlockMean(X=int(size / 8), Y=int(size / 8), boundary="trim")
+                | f"bm{size}" >> BlockMean(X=int(size / 8), Y=int(size / 8), boundary="pad")
                 | f"cc{size}"
                 >> xbeam.ConsolidateChunks(
                     target_chunks={"features": -1, "time": 1, "X": 64, "Y": 64}

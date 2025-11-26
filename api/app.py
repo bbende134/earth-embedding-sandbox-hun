@@ -19,7 +19,7 @@ from shapely.ops import transform
 from api.ratelimiter import check_redis_connection, rate_limiter
 
 EMB_DIM = 64
-COLLECTION = os.getenv("COLLECTION", "geo_embeddings")
+COLLECTION = os.getenv("COLLECTION", "hungary_embeddings")
 
 MILVUS_HOST = os.getenv("MILVUS_HOST", "localhost")
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
@@ -97,7 +97,7 @@ class NeighbourQuery(BaseModel):
     nprobe: int = Query(32, le=64)
     year: int = Query(2024, ge=2017, le=2030)
     coordinate_system: str = Query("geographic", regex="^(geographic|utm)$")
-    z: int = Query(None, ge=8, le=256)  # Optional: manual zoom level override
+    z: int | None = Query(None, ge=8, le=256)  # Optional: manual zoom level override
 
 
 def _get_vector_for_latlon(

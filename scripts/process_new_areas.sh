@@ -2,13 +2,18 @@
 
 # Script to process new areas for embedding extraction
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$ROOT_DIR"
+
 AREAS=($(ls small_areas/*.geojson | sed 's/small_areas\///' | sed 's/\.geojson//'))
 SERVICE_ACCOUNT="bendebarcza@gen-lang-client-0291927848.iam.gserviceaccount.com"
 PROJECT="86493264147"
-YEARS=(2017 2018 2019 2020 2021 2022 2023)  # Years to process
+YEARS=(2017)  # Years to process
+COLLECTION="hungary_with_neighbors_embeddings"  # Collection to load data into
 
 # Set credentials
-export GOOGLE_APPLICATION_CREDENTIALS="/home/barczabende/dev/earth-embedding-sandbox-hun/gen-lang-client-0291927848-14f8e1a428bd.json"
+export GOOGLE_APPLICATION_CREDENTIALS="$ROOT_DIR/gen-lang-client-0291927848-14f8e1a428bd.json"
 export HV_URL="https://earthengine-highvolume.googleapis.com"
 
 for area in "${AREAS[@]}"; do
@@ -56,7 +61,7 @@ except Exception as e:
       --service_account_email $SERVICE_ACCOUNT \
       --project $PROJECT \
       --runner DirectRunner \
-      --ee_max_num_workers 1 \
+      --ee_max_num_workers 2 \
       --direct_num_workers 1 \
       --start_date ${year}-01-01 \
       --end_date ${year}-12-31
@@ -91,6 +96,7 @@ except Exception as e:
     reduced_archive=gs://earth-embeddings-hungary-output/${area}_${year}_embeddings \
     GCP_PROJECT_ID=$PROJECT \
     YEARS="$(echo $YEARS | tr ' ' ',')" \
+    COLLECTION=$COLLECTION \
     uv run python pipeline/3_load_into_db.py
 
     echo "Completed processing $area year $year"

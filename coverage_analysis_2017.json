@@ -1,0 +1,8 @@
+{
+  "timestamp": "1760621631.4824362",
+  "total_records": 16384,
+  "covered_area_sq_deg": 0.06539733097960634,
+  "coverage_percentage": 0.145327402176903,
+  "retrieval_method": "iterative_pagination",
+  "milvus_limit": 16384
+}

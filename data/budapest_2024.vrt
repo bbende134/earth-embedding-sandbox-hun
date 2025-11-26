@@ -1,0 +1,1926 @@
+<VRTDataset rasterXSize="4454" rasterYSize="3342">
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform>  1.8899924757175850e+01,  8.9831528411952148e-05,  0.0000000000000000e+00,  4.7600199769510439e+01,  0.0000000000000000e+00, -8.9831528411952148e-05</GeoTransform>
+  <VRTRasterBand dataType="Float64" band="1">
+    <ColorInterp>Gray</ColorInterp>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="2">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="3">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="4">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="5">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>5</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>5</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>5</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>5</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="6">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>6</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>6</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>6</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>6</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="7">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>7</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>7</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>7</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>7</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="8">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>8</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>8</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>8</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>8</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="9">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>9</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>9</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>9</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>9</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="10">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>10</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>10</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>10</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>10</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="11">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>11</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>11</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>11</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>11</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="12">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>12</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>12</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>12</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>12</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="13">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>13</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>13</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>13</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>13</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="14">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>14</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>14</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>14</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>14</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="15">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>15</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>15</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>15</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>15</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="16">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>16</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>16</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>16</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>16</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="17">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>17</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>17</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>17</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>17</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="18">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>18</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>18</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>18</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>18</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="19">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>19</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>19</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>19</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>19</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="20">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>20</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>20</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>20</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>20</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="21">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>21</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>21</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>21</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>21</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="22">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>22</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>22</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>22</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>22</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="23">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>23</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>23</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>23</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>23</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="24">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>24</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>24</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>24</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>24</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="25">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>25</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>25</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>25</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>25</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="26">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>26</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>26</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>26</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>26</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="27">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>27</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>27</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>27</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>27</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="28">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>28</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>28</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>28</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>28</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="29">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>29</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>29</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>29</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>29</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="30">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>30</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>30</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>30</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>30</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="31">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>31</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>31</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>31</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>31</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="32">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>32</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>32</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>32</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>32</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="33">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>33</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>33</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>33</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>33</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="34">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>34</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>34</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>34</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>34</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="35">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>35</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>35</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>35</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>35</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="36">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>36</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>36</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>36</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>36</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="37">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>37</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>37</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>37</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>37</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="38">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>38</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>38</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>38</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>38</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="39">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>39</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>39</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>39</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>39</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="40">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>40</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>40</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>40</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>40</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="41">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>41</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>41</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>41</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>41</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="42">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>42</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>42</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>42</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>42</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="43">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>43</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>43</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>43</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>43</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="44">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>44</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>44</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>44</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>44</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="45">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>45</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>45</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>45</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>45</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="46">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>46</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>46</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>46</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>46</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="47">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>47</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>47</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>47</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>47</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="48">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>48</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>48</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>48</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>48</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="49">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>49</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>49</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>49</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>49</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="50">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>50</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>50</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>50</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>50</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="51">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>51</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>51</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>51</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>51</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="52">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>52</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>52</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>52</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>52</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="53">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>53</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>53</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>53</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>53</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="54">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>54</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>54</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>54</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>54</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="55">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>55</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>55</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>55</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>55</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="56">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>56</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>56</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>56</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>56</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="57">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>57</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>57</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>57</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>57</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="58">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>58</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>58</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>58</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>58</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="59">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>59</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>59</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>59</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>59</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="60">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>60</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>60</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>60</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>60</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="61">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>61</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>61</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>61</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>61</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="62">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>62</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>62</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>62</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>62</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="63">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>63</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>63</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>63</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>63</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float64" band="64">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000000000.tif</SourceFilename>
+      <SourceBand>64</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+      <DstRect xOff="0" yOff="0" xSize="3072" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000000000-0000003072.tif</SourceFilename>
+      <SourceBand>64</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="3072" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="3072" />
+      <DstRect xOff="3072" yOff="0" xSize="1382" ySize="3072" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000000000.tif</SourceFilename>
+      <SourceBand>64</SourceBand>
+      <SourceProperties RasterXSize="3072" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="3072" ySize="270" />
+      <DstRect xOff="0" yOff="3072" xSize="3072" ySize="270" />
+    </SimpleSource>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">budapest_2024-0000003072-0000003072.tif</SourceFilename>
+      <SourceBand>64</SourceBand>
+      <SourceProperties RasterXSize="1382" RasterYSize="270" DataType="Float64" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1382" ySize="270" />
+      <DstRect xOff="3072" yOff="3072" xSize="1382" ySize="270" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <OverviewList resampling="nearest">2 4 8 16</OverviewList>
+</VRTDataset>

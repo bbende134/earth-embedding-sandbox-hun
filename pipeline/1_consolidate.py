@@ -33,7 +33,7 @@ logger.setLevel(logging.DEBUG)
 RAW_CHUNKS = {"time": 1, "X": 256, "Y": 256}
 RAW_CHUNKS_WITH_FEATURES = {"features": 1, "time": 1, "X": 256, "Y": 256}
 STACKED_CHUNKS = {"features": -1, "time": 1, "X": 256, "Y": 256}
-FINAL_CHUNKS = {"features": -1, "time": 1, "X": 64, "Y": 64}
+FINAL_CHUNKS = {"features": 64, "time": 1, "Y": 64, "X": 64}
 ITEMSIZE = 4  # 1 variable x 4 bytes (float32)
 
 
@@ -96,6 +96,12 @@ class CustomOptions(PipelineOptions):
 
 def to_array(ds: xr.Dataset) -> xr.DataArray:
     """Convert a dataset to a DataArray and squeeze it."""
+    # Drop spatial_ref if present to avoid xarray_beam issues
+    if "spatial_ref" in ds:
+        ds = ds.drop_vars("spatial_ref")
+    if "spatial_ref" in ds.coords:
+        ds = ds.drop_vars("spatial_ref")
+
     # reshape feature variables into a coordinate
     new_array = ds.to_dataarray(dim="features")
 
@@ -128,7 +134,9 @@ def main(argv: list[str]) -> None:
                 "Use --raw_archives for merging multiple archives."
             )
         # single archive case
-        if main_options.get("service_account_email"):
+        if main_options.get("service_account_email") and os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS"
+        ):
             import gcsfs
             from google.oauth2 import service_account
 
@@ -223,12 +231,13 @@ def main(argv: list[str]) -> None:
                 | xbeam.DatasetToChunks(ds_on_disk, chunks=source_chunks)
                 # re-org to array and assign the new coordinates
                 | beam.MapTuple(lambda k, ds: (k, to_array(ds)))
-                | xbeam.SplitChunks({"features": 1, "time": 1, "X": 512, "Y": 512})
-                | xbeam.ConsolidateChunks({"features": -1, "time": 1, "X": 512, "Y": 512})
+                | xbeam.SplitChunks({"features": 1, "time": 1, "X": 128, "Y": 128})
+                # Consolidate features but keep spatial chunks for efficient block reduction
+                | xbeam.ConsolidateChunks({"features": -1, "time": 1, "X": 128, "Y": 128})
                 # block-reduce the dataset
                 | BlockMean(X=8, Y=8, boundary="trim")
                 # consolidate the chunks back together
-                # | xbeam.ConsolidateChunks(target_chunks=FINAL_CHUNKS)
+                | "ConsolidateFinalChunks" >> xbeam.ConsolidateChunks(target_chunks=FINAL_CHUNKS)
                 | xbeam.ChunksToZarr(
                     custom_options.reduced_archive + "_z8",
                     template=blocked_template,

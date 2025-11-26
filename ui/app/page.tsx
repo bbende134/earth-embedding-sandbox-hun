@@ -96,7 +96,7 @@ export default function EarthEmbeddings() {
 
   // New: data version (year)
   const [selectedYear, setSelectedYear] = useState(2024);
-  const availableYears = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+  const availableYears = [2024, 2017];
   const [coordinateSystem, setCoordinateSystem] = useState<'geographic' | 'utm'>('geographic');
   const [selectedZ, setSelectedZ] = useState<number | null>(null); // null = auto, number = manual
 

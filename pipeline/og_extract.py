@@ -26,6 +26,7 @@ import pyproj
 import xarray as xr
 import xarray_beam as xbeam
 from apache_beam.options.pipeline_options import PipelineOptions
+from cloudpathlib import GSPath
 from shapely import geometry
 from shapely.geometry import shape
 from shapely.ops import transform
@@ -34,13 +35,11 @@ from xarray_beam._src import threadmap
 from xarray_beam._src.core import Key
 from xee import EarthEngineBackendEntrypoint
 
-# from absl import flags
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 ALL_BANDS = [f"A{i:02d}" for i in range(64)]
-RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024}  # restored to original working size
+RAW_CHUNKS = {"time": 1, "X": 1024, "Y": 1024}  # this makes nice 10km/4mb chunks
 
 
 class CustomOptions(PipelineOptions):
@@ -63,25 +62,13 @@ class CustomOptions(PipelineOptions):
         parser.add_argument(
             "--ee_max_num_workers",
             type=int,
-            default=10,
+            default=2,
             help="Maximum number of workers for Earth Engine operations.",
         )
         parser.add_argument(
             "--utm_zone",
             type=str,
             required=True,
-        )
-        parser.add_argument(
-            "--start_date",
-            type=str,
-            required=True,
-            help="Start date for filtering (YYYY-MM-DD).",
-        )
-        parser.add_argument(
-            "--end_date",
-            type=str,
-            required=True,
-            help="End date for filtering (YYYY-MM-DD).",
         )
         parser.add_argument("--raw_archive", type=str, required=True, help="The output zarr path.")
 
@@ -123,34 +110,18 @@ def main(argv: list[str]) -> None:
     )
 
     # ### Earth Engine Initialization ###
-    # ### Earth Engine Initialization ###
-    if main_options.get("service_account_email") and os.environ.get(
-        "GOOGLE_APPLICATION_CREDENTIALS"
-    ):
-        credentials = ee.ServiceAccountCredentials(
-            main_options["service_account_email"], os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-        )
-        ee.Initialize(
-            credentials=credentials,
-            project=main_options["project"],
-            url=os.environ.get("HV_URL", "https://earthengine-highvolume.googleapis.com"),
-        )
-    else:
-        print("Using default Earth Engine credentials.")
-        try:
-            ee.Initialize(
-                project=main_options.get("project"),
-                url=os.environ.get("HV_URL", "https://earthengine-highvolume.googleapis.com"),
-            )
-        except Exception:
-            ee.Authenticate()
-            ee.Initialize(
-                project=main_options.get("project"),
-                url=os.environ.get("HV_URL", "https://earthengine-highvolume.googleapis.com"),
-            )
+    credentials = ee.ServiceAccountCredentials(
+        main_options["service_account_email"], os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+    )
+
+    ee.Initialize(
+        credentials=credentials,
+        project=main_options["project"],
+        url=os.environ.get("HV_URL", "https://earthengine-highvolume.googleapis.com"),
+    )
 
     # Load the area of interest from a geojson file stored in GCS
-    with open(custom_options.input_geojson) as f:
+    with open(GSPath(custom_options.input_geojson)) as f:
         geojson = json.loads(f.read())
         aoi = shape(geojson["geometry"])
 
@@ -179,11 +150,11 @@ def main(argv: list[str]) -> None:
 
     im_float = (
         ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL")
-        .filterDate(custom_options.start_date, custom_options.end_date)
+        .filterDate(ee.Date("2023-12-30"), ee.Date("2024-01-02"))
         .filterBounds(aoi_ee)
         .select(bands)
         .mosaic()
-        # Removed .clip(aoi_ee) - this was masking all data
+        .clip(aoi_ee)
     )
 
     # Optionally quantize according to the original paper https://arxiv.org/pdf/2507.22291
@@ -197,12 +168,14 @@ def main(argv: list[str]) -> None:
     #     .int8()  # Convert to int8
     # )
 
-    # im_float = im_quantized
+    # 2 threads, 4 vms, standard-8 - out of cpu
+    # 8900 aois not doing; 2707 aois doing? -> 11600 sounds about right.
+    # 2707 @ 1024x1024x64x4 = 268mb x 2707 = 726gb
 
     ds = xr.open_dataset(
         im_float,
         engine=EarthEngineBackendEntrypoint,
-        projection=ee.Projection(custom_options.utm_zone, transform=affine),
+        projection=ee.Projection("EPSG:32630", transform=affine),
         geometry=list(aoi.bounds),
         scale=scale,
         chunks=RAW_CHUNKS,
@@ -216,7 +189,7 @@ def main(argv: list[str]) -> None:
         },
         getitem_kwargs={
             "max_retries": 10,
-            "initial_delay": 60000,  # 60 seconds initial delay before retrying
+            "initial_delay": 1000,  # increase the delay before retrying
         },
     )
 
@@ -228,7 +201,6 @@ def main(argv: list[str]) -> None:
         """A shim overwrite to obtain chunks that intersect with the area of interest."""
         chunk_indices = [range(len(sizes)) for sizes in offsets.values()]
         count_skipped_aois = 0
-        processed_chunks = 0
         for indices in itertools.product(*chunk_indices):
             key_offsets = {
                 dim: offsets[dim][index] for dim, index in zip(offsets, indices, strict=False)
@@ -246,9 +218,6 @@ def main(argv: list[str]) -> None:
                     yield Key(key_offsets)
                 else:
                     yield Key(key_offsets, vars)
-                processed_chunks += 1
-                if processed_chunks % 10 == 0:
-                    print(f"Queued {processed_chunks} chunks for processing")
             else:
                 count_skipped_aois += 1
                 if count_skipped_aois % 100 == 0:
@@ -289,33 +258,21 @@ def main(argv: list[str]) -> None:
     print("~~~~ template ~~~~")
     print(template)
 
-    # Make zarr_chunks adaptive to data size
-    adaptive_zarr_chunks = {}
-    for dim in ds.sizes:
-        adaptive_zarr_chunks[dim] = ds.sizes[dim]
-
-    try:
-        with beam.Pipeline(options=options) as root:
-            _ = (
-                root
-                # First pull in the dataset and write it to chunks
-                | ShimDatasetToChunks(
-                    ds,
-                    chunks=RAW_CHUNKS,
-                    num_threads=main_options["ee_max_num_workers"],
-                )
-                | xbeam.ChunksToZarr(
-                    custom_options.raw_archive,
-                    template=template,
-                    zarr_chunks=adaptive_zarr_chunks,
-                )
+    with beam.Pipeline(options=options) as root:
+        _ = (
+            root
+            # First pull in the dataset and write it to chunks
+            | ShimDatasetToChunks(
+                ds,
+                chunks=RAW_CHUNKS,
+                num_threads=main_options["ee_max_num_workers"],
             )
-    except Exception as e:
-        print(f"Pipeline failed with error: {e}")
-        import traceback
-
-        traceback.print_exc()
-        raise
+            | xbeam.ChunksToZarr(
+                custom_options.raw_archive,
+                template=template,
+                zarr_chunks=RAW_CHUNKS,
+            )
+        )
 
 
 if __name__ == "__main__":

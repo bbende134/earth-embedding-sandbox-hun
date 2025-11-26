@@ -45,7 +45,7 @@ down-v-app:
 # ### pipeline steps #### #
 # ####################### #
 extract-dataflow:
-	python pipeline/0_extract.py \
+	uv run python pipeline/0_extract.py \
 		--input_geojson $$geojson_path \
 		--raw_archive $$raw_archive \
 		--runner DataflowRunner \
@@ -70,7 +70,7 @@ extract-dataflow-bandwise:
 		job_name="extract-dataset-subset-$$(echo $$band_set | tr ',' '-' | tr '[:upper:]' '[:lower:]')"; \
 		raw_archive_banded="$${raw_archive}-$$(echo $$band_set | tr ',' '-')"; \
 		echo "→ Running extract for bands: $$band_set (job: $$job_name) → raw_archive=$$raw_archive_banded"; \
-		python pipeline/0_extract.py \
+		uv run python pipeline/0_extract.py \
 			--input_geojson $${geojson_path} \
 			--raw_archive "$$raw_archive_banded" \
 			--runner DataflowRunner \
@@ -91,7 +91,7 @@ extract-dataflow-bandwise:
 	done
 
 extract-local:
-	python pipeline/0_extract.py \
+	uv run python pipeline/0_extract.py \
 		--input_geojson $$geojson_path \
 		--raw_archive $$raw_archive \
 		--runner DirectRunner \
@@ -102,7 +102,7 @@ extract-local:
 		--ee_max_num_workers $$ee_max_num_workers
 
 consolidate-dataflow:
-	python pipeline/1_consolidate.py \
+	uv run python pipeline/1_consolidate.py \
 		--raw_archive $$raw_archive \
 		--reduced_archive $$reduced_archive \
 		--runner DataflowRunner \
@@ -118,7 +118,7 @@ consolidate-dataflow:
 		--machine_type $$machine_type_consolidate
 
 reduce-dataflow:
-	python pipeline/2_reduce.py \
+	uv run python pipeline/2_reduce.py \
 		--reduced_archive $$reduced_archive \
 		--runner DataflowRunner \
 		--temp_location $$temp_location \
