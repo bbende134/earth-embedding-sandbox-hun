@@ -4,6 +4,7 @@ Bypasses the complex pipeline and directly extracts data to disk.
 """
 
 import json
+import sys
 
 import ee
 import xarray as xr
@@ -49,7 +50,7 @@ print(f"Sample value at Budapest center: {sample}")
 
 if sample.get("A00") is None:
     print("ERROR: No data available at sample point!")
-    exit(1)
+    sys.exit(1)
 
 # For simplicity, let's extract just a smaller region first to test
 # Budapest center: 19.04, 47.5

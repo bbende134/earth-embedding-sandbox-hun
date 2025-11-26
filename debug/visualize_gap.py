@@ -1,7 +1,9 @@
+import os
+
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from shapely.geometry import box
-import os
+
 
 def main():
     # Load Hungary map
@@ -16,16 +18,17 @@ def main():
     # Guessing based on "Hortobágy" / Eastern gap
     # Try: Lon 21.0-22.0, Lat 47.5-48.0
     missing_box = box(21.0, 47.5, 22.0, 48.0)
-    missing_gdf = gpd.GeoDataFrame({'geometry': [missing_box]}, crs=gdf.crs)
+    missing_gdf = gpd.GeoDataFrame({"geometry": [missing_box]}, crs=gdf.crs)
 
     # Plot
-    fig, ax = plt.subplots(figsize=(12, 8))
-    gdf.plot(ax=ax, color='lightgreen', edgecolor='black', alpha=0.5)
-    missing_gdf.plot(ax=ax, color='red', alpha=0.5, edgecolor='red')
-    
+    _fig, ax = plt.subplots(figsize=(12, 8))
+    gdf.plot(ax=ax, color="lightgreen", edgecolor="black", alpha=0.5)
+    missing_gdf.plot(ax=ax, color="red", alpha=0.5, edgecolor="red")
+
     plt.title("Hungary with Candidate Missing Area (Red)")
     plt.savefig("debug/gap_check.png")
     print("Saved debug/gap_check.png")
+
 
 if __name__ == "__main__":
     main()

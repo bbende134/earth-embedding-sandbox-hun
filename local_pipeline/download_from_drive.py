@@ -10,7 +10,6 @@ import os
 import google.auth
 from dotenv import load_dotenv
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
@@ -25,34 +24,34 @@ SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 # Request offline access to get a refresh token
 import socket
 import subprocess
-import os
+
 
 def _kill_process_on_port(port):
     try:
         # Try to bind to check if port is free
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(("127.0.0.1", port))
-            return # Port is free
+            return  # Port is free
     except OSError as e:
         if "Address already in use" not in str(e):
-            raise # Re-raise if it's not the "address already in use" error
+            raise  # Re-raise if it's not the "address already in use" error
 
         print(f"Port {port} is in use. Attempting to kill process...")
-        if os.name == 'posix': # Linux/macOS
+        if os.name == "posix":  # Linux/macOS
             try:
-                pid_output = subprocess.check_output(['lsof', '-t', f'-i:{port}']).decode().strip()
+                pid_output = subprocess.check_output(["lsof", "-t", f"-i:{port}"]).decode().strip()
                 if pid_output:
                     pid = int(pid_output.splitlines()[0])
                     print(f"Killing process {pid} on port {port}...")
-                    os.kill(pid, 9) # SIGKILL
+                    os.kill(pid, 9)  # SIGKILL
                     print(f"Process {pid} killed.")
                 else:
                     print(f"Could not find process on port {port} using lsof.")
             except (subprocess.CalledProcessError, ValueError) as e:
                 print(f"Error finding/killing process on port {port} (lsof): {e}")
-        elif os.name == 'nt': # Windows
+        elif os.name == "nt":  # Windows
             try:
-                output = subprocess.check_output(['netstat', '-ano']).decode()
+                output = subprocess.check_output(["netstat", "-ano"]).decode()
                 pid = None
                 for line in output.splitlines():
                     if f":{port}" in line and "LISTENING" in line:
@@ -62,7 +61,7 @@ def _kill_process_on_port(port):
                             break
                 if pid:
                     print(f"Killing process {pid} on port {port}...")
-                    subprocess.run(['taskkill', '/F', '/PID', str(pid)], check=True)
+                    subprocess.run(["taskkill", "/F", "/PID", str(pid)], check=True)
                     print(f"Process {pid} killed.")
                 else:
                     print(f"Could not find process on port {port} using netstat.")
@@ -70,6 +69,7 @@ def _kill_process_on_port(port):
                 print(f"Error finding/killing process on port {port} (netstat/taskkill): {e}")
         else:
             print(f"Warning: Cannot automatically kill process on port {port} on this OS.")
+
 
 def authenticate(force_interactive=False):
     """
@@ -82,7 +82,7 @@ def authenticate(force_interactive=False):
     # 1. Try Service Account (GOOGLE_APPLICATION_CREDENTIALS)
     if not force_interactive:
         try:
-            creds, project_id = google.auth.default(scopes=SCOPES)
+            creds, _project_id = google.auth.default(scopes=SCOPES)
             # Check if we actually got valid credentials (sometimes default() returns anonymous if not found)
             if creds and hasattr(creds, "service_account_email"):
                 print(f"Using Service Account: {creds.service_account_email}")

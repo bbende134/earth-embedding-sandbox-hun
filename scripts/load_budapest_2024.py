@@ -1,7 +1,10 @@
 import logging
 import os
+import traceback
 
 import numpy as np
+import pandas as pd
+import pyproj
 import xarray as xr
 from dask.array.core import slices_from_chunks
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections, utility
@@ -68,8 +71,6 @@ def reshape(block, z, year):
         df = df.drop("xy", axis=1)
 
     # Coordinate transformation
-    import pyproj
-
     # Assuming the same UTM zone as extraction: EPSG:32634
     transformer = pyproj.Transformer.from_crs("EPSG:32634", "EPSG:4326", always_xy=True)
 
@@ -100,11 +101,6 @@ def reshape(block, z, year):
 
 
 def main():
-    import pandas as pd  # Ensure pandas is available inside reshape if needed, or global
-
-    global pd
-    import pandas as pd
-
     col = ensure_collection()
 
     year = 2024
@@ -137,8 +133,6 @@ def main():
 
         except Exception as e:
             print(f"Error processing z{level}: {e}")
-            import traceback
-
             traceback.print_exc()
 
 

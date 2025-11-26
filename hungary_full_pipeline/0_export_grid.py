@@ -94,7 +94,9 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--test", action="store_true", help="Export a single small test tile")
-    parser.add_argument("--geojson", type=str, default="hungary.geojson", help="Path to the GeoJSON file to grid.")
+    parser.add_argument(
+        "--geojson", type=str, default="hungary.geojson", help="Path to the GeoJSON file to grid."
+    )
     args = parser.parse_args()
 
     if args.test:

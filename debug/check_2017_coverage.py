@@ -139,7 +139,7 @@ def main():
 
     # Check GCS coverage
     print("\nChecking GCS coverage for 2017...")
-    has_coverage, dummy_area = check_gcs_coverage(year=2017)
+    has_coverage, _dummy_area = check_gcs_coverage(year=2017)
 
     coverage_percentage = 100.0 if has_coverage else 0.0
     print(f"GCS Coverage: {'Yes' if has_coverage else 'No'} ({coverage_percentage:.1f}%)")

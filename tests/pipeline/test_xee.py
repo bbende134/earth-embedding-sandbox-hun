@@ -18,7 +18,7 @@ def test_clip_small_dataset(ee_initialize):
 
     reproject = pyproj.Transformer.from_crs("EPSG:4326", "EPSG:27700", always_xy=True).transform
     aoi_27700 = transform(reproject, aoi)
-    minx, miny, maxx, maxy = aoi_27700.bounds
+    minx, _miny, _maxx, maxy = aoi_27700.bounds
 
     # Set desired pixel size
     scale = 100  # meters
@@ -55,6 +55,6 @@ def test_clip_small_dataset(ee_initialize):
     print("materializing to zarr")
     ds.to_zarr("test.zarr", mode="w")
 
-    z = zarr.open("test.zarr")
+    zarr.open("test.zarr")
 
     assert True

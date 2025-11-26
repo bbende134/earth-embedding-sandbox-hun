@@ -44,7 +44,7 @@ def authenticate(force_interactive=False):
         try:
             import google.auth
 
-            creds, project_id = google.auth.default(scopes=SCOPES)
+            creds, _project_id = google.auth.default(scopes=SCOPES)
             # Check if we actually got valid credentials (sometimes default() returns anonymous if not found)
             if creds and hasattr(creds, "service_account_email"):
                 print(f"Using Service Account: {creds.service_account_email}")
@@ -92,7 +92,7 @@ def authenticate(force_interactive=False):
             flow = InstalledAppFlow.from_client_secrets_file(cred_path, SCOPES)
             # Use local server flow (standard for desktop apps)
             # Request offline access to get a refresh token
-            creds = flow.run_local_server(port=8080, access_type='offline', prompt='consent')
+            creds = flow.run_local_server(port=8080, access_type="offline", prompt="consent")
 
         # Save token for next time (only for interactive auth)
         with open("local_pipeline/token.json", "w") as token:
@@ -135,7 +135,7 @@ def download_file(service, file_id, filepath):
         done = False
         while not done:
             status, done = downloader.next_chunk()
-            print(f"Download progress: {int(status.progress() * 100)}%", end='\r')
+            print(f"Download progress: {int(status.progress() * 100)}%", end="\r")
     print(f"Downloaded: {filepath}")
 
 
@@ -147,13 +147,13 @@ def delete_file(service, file_id):
 def process_tile(tile_path):
     """Run the processing pipeline for a single tile."""
     tile_name = os.path.basename(tile_path).replace(".tif", "")
-    
+
     # Check if this is a large tile that needs splitting (>500MB)
     file_size_mb = os.path.getsize(tile_path) / (1024 * 1024)
     if file_size_mb > 500:
         print(f"\n--- Large tile detected ({file_size_mb:.1f}MB): {tile_name} ---")
         print("Splitting into quarters to avoid Beam gRPC limit...")
-        
+
         # Split the TIF into 4 quarters
         cmd = [
             "uv",
@@ -166,7 +166,7 @@ def process_tile(tile_path):
             LOCAL_DATA_DIR,
         ]
         subprocess.run(cmd, check=True)
-        
+
         # Process each quarter
         base_name = os.path.basename(tile_path).replace(".tif", "")
         for quadrant in ["NW", "NE", "SW", "SE"]:
@@ -174,12 +174,12 @@ def process_tile(tile_path):
             if os.path.exists(quarter_path):
                 print(f"\nProcessing quarter: {quadrant}")
                 process_single_tile(quarter_path)
-        
+
         # Delete the original large TIF
         os.remove(tile_path)
         print(f"✓ {tile_name} (large tile) split and processed")
         return
-    
+
     # Process normal-sized tile
     process_single_tile(tile_path)
 
@@ -230,10 +230,12 @@ def process_single_tile(tile_path):
             try:
                 subprocess.run(cmd, check=True)
                 break  # Success
-            except subprocess.CalledProcessError as e:
+            except subprocess.CalledProcessError:
                 if attempt < max_retries - 1:
-                    wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
-                    print(f"Consolidation failed (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
+                    wait_time = 2**attempt  # Exponential backoff: 1s, 2s, 4s
+                    print(
+                        f"Consolidation failed (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s..."
+                    )
                     time.sleep(wait_time)
                 else:
                     print(f"Consolidation failed after {max_retries} attempts. Skipping this tile.")
@@ -294,8 +296,6 @@ def main():
     else:
         print("Mode: CONTINUOUS (Press Ctrl+C to stop)")
 
-    processed_count = 0
-
     while True:
         try:
             files = list_files(service, folder_id)
@@ -318,26 +318,25 @@ def main():
                 local_path = os.path.join(LOCAL_DATA_DIR, f["name"])
 
                 # Check if already processed (resume capability)
-                tile_name = f['name'].replace('.tif', '')
+                tile_name = f["name"].replace(".tif", "")
                 zarr_raw = os.path.join(PROCESSED_DIR, f"{tile_name}_raw.zarr")
                 zarr_reduced = os.path.join(PROCESSED_DIR, f"{tile_name}_reduced.zarr")
-                
+
                 # If reduced Zarr exists, skip download and processing, go straight to load/cleanup
                 if os.path.exists(zarr_reduced) or glob.glob(f"{zarr_reduced}*"):
                     print(f"Found existing processed data for {tile_name}. Resuming...")
-                    local_path = os.path.join(LOCAL_DATA_DIR, f['name']) # Path needed for cleanup
+                    local_path = os.path.join(LOCAL_DATA_DIR, f["name"])  # Path needed for cleanup
+                # Download only if local file doesn't exist or is partial
+                elif not os.path.exists(local_path):
+                    download_file(service, f["id"], local_path)
+                    # Verify download succeeded
+                    if not os.path.exists(local_path) or os.path.getsize(local_path) == 0:
+                        print(f"ERROR: Download failed for {local_path} (File missing or empty).")
+                        if os.path.exists(local_path):
+                            os.remove(local_path)
+                        continue
                 else:
-                    # Download only if local file doesn't exist or is partial
-                    if not os.path.exists(local_path):
-                        download_file(service, f["id"], local_path)
-                        # Verify download succeeded
-                        if not os.path.exists(local_path) or os.path.getsize(local_path) == 0:
-                            print(f"ERROR: Download failed for {local_path} (File missing or empty).")
-                            if os.path.exists(local_path):
-                                os.remove(local_path)
-                            continue
-                    else:
-                        print(f"File {local_path} already exists. Skipping download.")
+                    print(f"File {local_path} already exists. Skipping download.")
 
                 # Process
                 try:
@@ -348,15 +347,21 @@ def main():
 
                 except Exception as e:
                     print(f"ERROR processing {f['name']}: {e}")
-                    
+
                     error_str = str(e)
-                    
+
                     # Only delete the TIF if it's a conversion error (corrupt file)
                     # Don't delete for Beam timeout/resource errors (those are processing issues, not file issues)
                     is_conversion_error = "1_convert_to_zarr.py" in error_str
-                    is_beam_timeout = "DEADLINE_EXCEEDED" in error_str or "RESOURCE_EXHAUSTED" in error_str
-                    
-                    if "returned non-zero exit status" in error_str and is_conversion_error and not is_beam_timeout:
+                    is_beam_timeout = (
+                        "DEADLINE_EXCEEDED" in error_str or "RESOURCE_EXHAUSTED" in error_str
+                    )
+
+                    if (
+                        "returned non-zero exit status" in error_str
+                        and is_conversion_error
+                        and not is_beam_timeout
+                    ):
                         if os.path.exists(local_path):
                             print(f"Deleting potentially corrupt file: {local_path}")
                             os.remove(local_path)
@@ -364,7 +369,9 @@ def main():
                             if os.path.exists(zarr_raw):
                                 shutil.rmtree(zarr_raw, ignore_errors=True)
                     elif is_beam_timeout:
-                        print(f"Beam timeout/resource error - keeping file for manual retry or debugging")
+                        print(
+                            "Beam timeout/resource error - keeping file for manual retry or debugging"
+                        )
                         # Clean up partial outputs but keep the source TIF
                         if os.path.exists(zarr_raw):
                             shutil.rmtree(zarr_raw, ignore_errors=True)
@@ -388,21 +395,25 @@ def main():
             print(f"Loop error: {e}")
             # Check for RefreshError or invalid grant
             error_str = str(e)
-            if "RefreshError" in error_str or "invalid_grant" in error_str or "necessary fields" in error_str:
+            if (
+                "RefreshError" in error_str
+                or "invalid_grant" in error_str
+                or "necessary fields" in error_str
+            ):
                 print("Authentication token expired or invalid. Re-authenticating...")
                 try:
                     # Delete invalid token
-                    if os.path.exists('local_pipeline/token.json'):
-                        os.remove('local_pipeline/token.json')
-                    if os.path.exists('token.json'):
-                        os.remove('token.json')
-                    
+                    if os.path.exists("local_pipeline/token.json"):
+                        os.remove("local_pipeline/token.json")
+                    if os.path.exists("token.json"):
+                        os.remove("token.json")
+
                     # Force re-auth
                     service = get_drive_service()
                     print("Re-authentication successful.")
                 except Exception as auth_e:
                     print(f"Re-authentication failed: {auth_e}")
-            
+
             time.sleep(60)
 
 

@@ -288,7 +288,7 @@ def main():
         return
 
     # Compare with target
-    target_geom, target_area, coverage_pct = calculate_missing_areas(covered_geom, covered_area)
+    _target_geom, _target_area, coverage_pct = calculate_missing_areas(covered_geom, covered_area)
 
     # Save analysis
     save_analysis(all_data, covered_area, coverage_pct)

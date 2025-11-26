@@ -43,7 +43,7 @@ def authenticate():
     try:
         import google.auth
 
-        creds, project_id = google.auth.default(scopes=SCOPES)
+        creds, _project_id = google.auth.default(scopes=SCOPES)
         if creds and hasattr(creds, "service_account_email"):
             logger.info(f"Using Service Account: {creds.service_account_email}")
             return creds
@@ -115,7 +115,7 @@ async def download_file(service, file_id, filepath, retries=3):
                     downloader = MediaIoBaseDownload(fh, request)
                     done = False
                     while not done:
-                        status, done = downloader.next_chunk()
+                        _status, done = downloader.next_chunk()
                 return filepath
             except Exception as e:
                 last_error = e
@@ -143,7 +143,7 @@ async def run_command(cmd, description):
     process = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
-    stdout, stderr = await process.communicate()
+    _stdout, stderr = await process.communicate()
 
     if process.returncode != 0:
         logger.error(f"Command failed: {description}\nStderr: {stderr.decode()}")

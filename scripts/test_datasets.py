@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # ### Earth Engine Initialization ###
 credentials = ee.ServiceAccountCredentials(
-    os.environ["service_account_email"], os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+    os.environ["SERVICE_ACCOUNT_EMAIL"], os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
 )
 
 ee.Initialize(

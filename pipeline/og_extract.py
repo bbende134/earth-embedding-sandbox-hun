@@ -125,7 +125,7 @@ def main(argv: list[str]) -> None:
         geojson = json.loads(f.read())
         aoi = shape(geojson["geometry"])
 
-    utm_abbrev = clean_and_parse_utm_zone(custom_options.utm_zone)
+    clean_and_parse_utm_zone(custom_options.utm_zone)
 
     # reproject the AOI to UTM
     reproject = pyproj.Transformer.from_crs(

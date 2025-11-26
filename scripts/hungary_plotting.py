@@ -62,7 +62,6 @@ def plot_hungary_distribution(
     print(f"Found {len(lats)} valid points (filtered by bbox).")
 
     # Check Z levels
-    z_levels = set()
     # We need to fetch z to check this.
     # But we only fetched lat/lon.
     # Let's assume we want to check z distribution if we fetched it.
@@ -118,16 +117,14 @@ def plot_hungary_distribution(
         # Use contourf for filled contours
         # cmap="RdYlGn_r" means Green (low) -> Red (high)
         cf = ax.contourf(X, Y, Z, cmap="RdYlGn_r", alpha=0.8, levels=20)
-        cb = fig.colorbar(cf, ax=ax, label="Density")
+        fig.colorbar(cf, ax=ax, label="Density")
     else:
         # Use hexbin for distribution map
         # User wants: Red = dense, Green = sparse.
         # We use RdYlGn_r (Green -> Red)
         # mincnt=1 ensures empty bins are transparent, revealing the green background
-        hb = ax.hexbin(
-            lons, lats, gridsize=100, cmap="RdYlGn_r", mincnt=1, bins="log", alpha=0.8
-        )
-        cb = fig.colorbar(hb, ax=ax, label="Log Count")
+        hb = ax.hexbin(lons, lats, gridsize=100, cmap="RdYlGn_r", mincnt=1, bins="log", alpha=0.8)
+        fig.colorbar(hb, ax=ax, label="Log Count")
 
     plt.title(f"Distribution of Coordinates for Year {year}")
     plt.xlabel("Longitude")

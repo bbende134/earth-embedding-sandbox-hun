@@ -1,5 +1,7 @@
-import geopandas as gpd
 import os
+
+import geopandas as gpd
+
 
 def main():
     f = "missing_areas_2017.geojson"
@@ -11,6 +13,7 @@ def main():
         print(f"Head: {gdf.head()}")
     else:
         print(f"{f} not found")
+
 
 if __name__ == "__main__":
     main()

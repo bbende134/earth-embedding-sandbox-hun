@@ -79,9 +79,8 @@ for i in range(10):
                 print(f"  Error: {status['error_message']}")
         break
 
-    if state == "RUNNING":
-        if "progress" in status:
-            print(f"    Progress: {status.get('progress', 0) * 100:.1f}%")
+    if state == "RUNNING" and "progress" in status:
+        print(f"    Progress: {status.get('progress', 0) * 100:.1f}%")
 
 if status["state"] == "READY":
     print("\n⏳ Task queued. Check status at: https://code.earthengine.google.com/tasks")

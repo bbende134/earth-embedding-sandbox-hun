@@ -74,9 +74,11 @@ while True:
         if record["id"] in ids_to_delete:
             has_all_zeros = all(val == 0.0 for val in record["embedding"])
             if not has_all_zeros:
-                print(
-                    f"WARNING: Record {record['id']} marked for deletion but has non-zero values: {record['embedding'][:5]}..."
+                warning_msg = (
+                    f"WARNING: Record {record['id']} marked for deletion "
+                    f"but has non-zero values: {record['embedding'][:5]}..."
                 )
+                print(warning_msg)
                 ids_to_delete.remove(record["id"])
 
     all_ids_to_delete.extend(ids_to_delete)
@@ -99,7 +101,7 @@ else:
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate distance between two coordinates in kilometers"""
-    R = 6371  # Earth's radius in km
+    r = 6371  # Earth's radius in km
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
     delta_phi = math.radians(lat2 - lat1)
@@ -110,7 +112,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
         + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) ** 2
     )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return R * c
+    return r * c
 
 
 collection_name = "hungary_with_neighbors_embeddings"
@@ -137,9 +139,11 @@ while True:
 exact_duplicates = {loc: ids for loc, ids in location_to_ids.items() if len(ids) > 1}
 
 if exact_duplicates:
-    print(
-        f"\nFound {len(exact_duplicates)} locations with exact lat/lon duplicates in {collection_name}:"
+    msg = (
+        f"\nFound {len(exact_duplicates)} locations with exact lat/lon "
+        f"duplicates in {collection_name}:"
     )
+    print(msg)
     for loc, ids in exact_duplicates.items():
         print(f"  Location: ({loc[0]}, {loc[1]})")
         print(f"    IDs: {ids}")
@@ -178,7 +182,7 @@ for record in all_records:
 
 # Find groups with multiple records at same rounded location
 proximity_duplicates = []
-for loc, records in rounded_location_to_records.items():
+for _loc, records in rounded_location_to_records.items():
     if len(records) > 1:
         # Check pairwise distances within the group
         for i, rec1 in enumerate(records):
@@ -200,9 +204,11 @@ for loc, records in rounded_location_to_records.items():
                     all_duplicate_ids.add(rec2["id"])
 
 if proximity_duplicates:
-    print(
-        f"\nFound {len(proximity_duplicates)} duplicate locations (within {distance_threshold_km} km) in {collection_name}:"
+    msg = (
+        f"\nFound {len(proximity_duplicates)} duplicate locations "
+        f"(within {distance_threshold_km} km) in {collection_name}:"
     )
+    print(msg)
     for dup in proximity_duplicates:
         print(f"  IDs: {dup['id1']}, {dup['id2']}")
         print(f"    Location 1: ({dup['lat1']}, {dup['lon1']})")
@@ -212,7 +218,7 @@ else:
     print(f"\nNo proximity-based duplicate locations found in {collection_name}")
 
 # Extract only the duplicate IDs
-duplicate_ids_list = sorted(list(all_duplicate_ids))
+duplicate_ids_list = sorted(all_duplicate_ids)
 print(f"\nTotal duplicate IDs found: {len(duplicate_ids_list)}")
 print("Duplicate IDs:", duplicate_ids_list)
 # %%
@@ -250,7 +256,7 @@ for record in all_records:
 
 # Find groups with multiple records at same rounded location
 proximity_duplicates = []
-for loc, records in rounded_location_to_records.items():
+for _loc, records in rounded_location_to_records.items():
     if len(records) > 1:
         # Check pairwise distances within the group
         for i, rec1 in enumerate(records):
@@ -270,9 +276,11 @@ for loc, records in rounded_location_to_records.items():
                     )
 
 if proximity_duplicates:
-    print(
-        f"\nFound {len(proximity_duplicates)} duplicate locations (within {distance_threshold_km} km) in {collection_name}:"
+    msg = (
+        f"\nFound {len(proximity_duplicates)} duplicate locations "
+        f"(within {distance_threshold_km} km) in {collection_name}:"
     )
+    print(msg)
     for dup in proximity_duplicates:
         print(f"  IDs: {dup['id1']}, {dup['id2']}")
         print(f"    Location 1: ({dup['lat1']}, {dup['lon1']})")

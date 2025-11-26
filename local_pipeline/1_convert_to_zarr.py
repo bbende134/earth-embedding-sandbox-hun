@@ -57,6 +57,7 @@ def main():
     # Write to Zarr
     print(f"\nWriting to {args.output}...")
     from dask.diagnostics import ProgressBar
+
     with ProgressBar():
         ds.to_zarr(args.output, mode="w")
 

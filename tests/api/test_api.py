@@ -28,6 +28,7 @@ def test_geojson_api_success(client):
         },
     )
     response.raise_for_status()  # Ensure we get a 2xx response
-    assert response.status_code == 200
+    http_ok = 200
+    assert response.status_code == http_ok
     data = response.json()
     assert "neighbours" in data

@@ -8,28 +8,28 @@ load_dotenv()
 
 
 @fixture(scope="session")
-def GCP_PROJECT_ID():
+def gcp_project_id():
     return os.environ["GCP_PROJECT_ID"]
 
 
 @fixture(scope="session")
-def HV_URL():
+def hv_url():
     return os.environ.get("HV_URL", "https://earthengine-highvolume.googleapis.com")
 
 
 @fixture(scope="session")
-def SERVICE_ACCOUNT_EMAIL():
-    return os.environ["service_account_email"]
+def service_account_email():
+    return os.environ["SERVICE_ACCOUNT_EMAIL"]
 
 
 @fixture(scope="session")
-def SERVICE_ACCOUNT_CREDENTIALS(SERVICE_ACCOUNT_EMAIL):
+def service_account_credentials(service_account_email):
     credentials = ee.ServiceAccountCredentials(
-        SERVICE_ACCOUNT_EMAIL, os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+        service_account_email, os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     )
     return credentials
 
 
 @fixture(scope="session")
-def ee_initialize(SERVICE_ACCOUNT_CREDENTIALS, GCP_PROJECT_ID, HV_URL):
-    ee.Initialize(credentials=SERVICE_ACCOUNT_CREDENTIALS, project=GCP_PROJECT_ID, url=HV_URL)
+def ee_initialize(service_account_credentials, gcp_project_id, hv_url):
+    ee.Initialize(credentials=service_account_credentials, project=gcp_project_id, url=hv_url)

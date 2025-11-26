@@ -134,9 +134,11 @@ def _get_vector_for_latlon(
     # Sort by distance (closest first) and return the closest valid embedding
     candidates.sort(key=lambda x: x[1])
     closest_emb, closest_dist, closest_lon, closest_lat = candidates[0]
-    print(
-        f"Selected embedding at distance {closest_dist:.6f} from centroid (lon={closest_lon:.6f}, lat={closest_lat:.6f})"
+    msg = (
+        f"Selected embedding at distance {closest_dist:.6f} from centroid "
+        f"(lon={closest_lon:.6f}, lat={closest_lat:.6f})"
     )
+    print(msg)
     return closest_emb
 
 
@@ -150,9 +152,9 @@ def which_z(query_area: float) -> int:
     z256 -> 2560x2560m -> 6553600sqm
     """
     # get the smallest area >= query_area, return its z
-    for area in sorted(AREA_THRESHOLDS.keys()):
-        if query_area <= area:
-            return AREA_THRESHOLDS[area]
+    for area_threshold in sorted(AREA_THRESHOLDS.keys()):
+        if query_area <= area_threshold:
+            return AREA_THRESHOLDS[area_threshold]
     # if larger than all, return the largest z
     return AREA_THRESHOLDS[sorted(AREA_THRESHOLDS.keys())[-1]]
 
@@ -199,7 +201,8 @@ def neighbors(neighbour_query: NeighbourQuery):
         raise HTTPException(status_code=400, detail="Query area is too small for any embeddings.")
 
     logger.info(
-        f"Query area: {query_area}, using z{query_z} {'(manual)' if neighbour_query.z is not None else '(auto)'}"
+        f"Query area: {query_area}, using z{query_z} "
+        f"{'(manual)' if neighbour_query.z is not None else '(auto)'}"
     )
 
     connect()
@@ -289,9 +292,11 @@ def neighbors(neighbour_query: NeighbourQuery):
         )[0]
         for h in hits:
             embedding = h.entity.get("embedding")
-            print(
-                f"Processing hit (second search) with embedding: {embedding[:5]}..., year: {h.entity.get('year')}"
+            msg = (
+                f"Processing hit (second search) with embedding: {embedding[:5]}..., "
+                f"year: {h.entity.get('year')}"
             )
+            print(msg)
             if not any(e != 0 for e in embedding):
                 print("Skipping zero embedding (second search)")
                 continue
@@ -333,7 +338,7 @@ def get_available_years():
         limit=10000,  # Should be enough to get all unique years
     )
 
-    unique_years = list(set(entity["year"] for entity in years_result))
+    unique_years = list({entity["year"] for entity in years_result})
     unique_years.sort(reverse=True)  # Most recent first
 
     return {"years": unique_years}
