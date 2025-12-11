@@ -83,6 +83,25 @@ services:
       - "etcd"
       - "minio"
 
+  backup:
+    container_name: milvus_dev-backup
+    image: milvusdb/milvus-backup:latest
+    environment:
+      MILVUS_ADDRESS: standalone
+      MILVUS_PORT: 19530
+      MINIO_ADDRESS: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET_NAME: milvus-bucket
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/backup:/app/backup
+      - ./backup.yaml:/app/configs/backup.yaml
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
+    depends_on:
+      - "etcd"
+      - "minio"
+      - "standalone"
 
 networks:
   default:

@@ -47,8 +47,8 @@ for collection_name in collections:
 #             print(record)
 
 # %%
-# Delete records with all-zero embeddings from hungary_embeddings
-collection_name = "hungary_with_neighbors_embeddings"
+# Delete records with all-zero embeddings from terra_S1RTC
+collection_name = "terra_S1RTC"
 collection = Collection(collection_name)
 
 # Use query_iterator to iterate over all records without offset limits

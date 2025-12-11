@@ -32,18 +32,25 @@ for collection_name in collections:
     print(f"\nCollection: {collection_name}")
     print(f"  Num entities: {collection.num_entities}")
     print(f"  Schema: {collection.schema}")
-    # Query distinct years
-    res = collection.query(expr="year >= 0", output_fields=["year"])
-    years = sorted({r["year"] for r in res})
-    print(f"Available years: {years}")
+    # Query distinct years if 'year' field exists
+    has_year = any(field.name == "year" for field in collection.schema.fields)
+    if has_year:
+        try:
+            res = collection.query(expr="year >= 0", output_fields=["year"])
+            years = sorted(list(set(r["year"] for r in res)))
+            print(f"Available years: {years}")
+        except Exception as e:
+            print(f"Could not query years: {e}")
+    else:
+        print("No 'year' field in this collection")
 
 # %%
 from hungary_plotting import plot_hungary_distribution
 
 plot_hungary_distribution(
-    2024,
+    # 2024,
     map_file="../hungary.geojson",
-    collection_name="high_res_hun",
+    collection_name="terra_S1RTC",
     style="hexbin",
 )
 # %%
@@ -53,13 +60,13 @@ plot_hungary_distribution(
 
 import numpy as np
 
-collection = Collection("high_res_hun")
+collection = Collection("terra_S1RTC")
 collection.load()  # Ensure collection is loaded
 
-print(f"\nChecking {collection_name} for all-zero embeddings...")
+print("\nChecking terra_S1RTC for all-zero embeddings...")
 
 # Use iterator for efficient batch processing
-iterator = collection.query_iterator(expr="", output_fields=["id", "vector"], batch_size=5000)
+iterator = collection.query_iterator(expr="", output_fields=["id", "embedding"], batch_size=5000)
 
 zero_count = 0
 total_checked = 0
@@ -70,7 +77,7 @@ while True:
         break
 
     for result in results:
-        vector = np.array(result["vector"])
+        vector = np.array(result["embedding"])
         if np.all(vector == 0):
             zero_count += 1
             print(f"  Found all-zero vector: ID={result['id']}")
@@ -97,7 +104,7 @@ else:
 
 import random
 
-collection = Collection("high_res_hun")
+collection = Collection("terra_S1RTC")
 collection.load()
 
 # Get a random entry
@@ -114,7 +121,9 @@ if res_min and res_max:
     start_id = random.randint(min_id, max(min_id, max_id))
 
     random_results = collection.query(
-        expr=f"id >= {start_id}", output_fields=["id", "lat", "lon", "vector"], limit=100
+        expr=f"id >= {start_id} and date",
+        output_fields=["id", "lat", "lon", "embedding"],
+        limit=10000,
     )
 else:
     random_results = []
@@ -127,25 +136,37 @@ if random_results:
     )
 
     # Search for top-k similar vectors
-    top_k = 500
+    top_k = 100
     print(f"\nSearching for top {top_k} most similar locations...")
 
     search_params = {"metric_type": "L2", "params": {"nprobe": 16}}
     results = collection.search(
-        data=[random_entry["vector"]],
-        anns_field="vector",
+        data=[random_entry["embedding"]],
+        anns_field="embedding",
         param=search_params,
         limit=top_k,
-        output_fields=["id", "lat", "lon", "year"],
+        output_fields=["id", "lat", "lon", "embedding"],
     )
 
     print(f"\nTop {top_k} most similar locations:")
+    query_vec = np.array(random_entry["embedding"])
     for i, hit in enumerate(results[0]):
-        distance = hit.distance
-        cosine_similarity = 1 - (distance**2) / 2
+        distance = hit.distance  # This is Squared Euclidean Distance
+
+        # Calculate true cosine similarity
+        hit_vec = np.array(hit.entity.get("embedding"))
+
+        norm_q = np.linalg.norm(query_vec)
+        norm_h = np.linalg.norm(hit_vec)
+
+        if norm_q > 0 and norm_h > 0:
+            cosine_similarity = np.dot(query_vec, hit_vec) / (norm_q * norm_h)
+        else:
+            cosine_similarity = 0.0
+
         print(
             f"  {i + 1}. ID={hit.id}, Lat={hit.entity.get('lat'):.4f}, Lon={hit.entity.get('lon'):.4f}, "
-            f"Year={hit.entity.get('year')}, Distance={distance:.4f}, Cosine Similarity={cosine_similarity:.8f}"
+            f"SqL2 Dist={distance:.4f}, Cosine Similarity={cosine_similarity:.8f}"
         )
 else:
     print("No results found in collection")
@@ -222,8 +243,8 @@ if random_results and results:
     plt.grid(True, linestyle="--", alpha=0.3)
 
     # Auto-adjust limits to show all points with margin
-    all_lons = [*similar_lons, query_lon]
-    all_lats = [*similar_lats, query_lat]
+    all_lons = similar_lons + [query_lon]
+    all_lats = similar_lats + [query_lat]
     margin = 0.05
     ax.set_xlim(min(all_lons) - margin, max(all_lons) + margin)
     ax.set_ylim(min(all_lats) - margin, max(all_lats) + margin)
@@ -231,5 +252,7 @@ if random_results and results:
     plt.tight_layout()
     plt.show()
 
+
+# %%
 
 # %%

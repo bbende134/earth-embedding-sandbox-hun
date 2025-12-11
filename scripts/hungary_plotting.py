@@ -7,7 +7,7 @@ from pymilvus import Collection, connections, list_collections
 
 
 def plot_hungary_distribution(
-    year,
+    year=None,
     collection_name="hungary_embeddings",
     map_file="hungary.geojson",
     save_file="hungary_distribution.png",
@@ -34,7 +34,9 @@ def plot_hungary_distribution(
     print(f"Querying collection: {collection_name} for year: {year}, zoom: {zoom}")
 
     # Query data
-    expr = f"year == {year}"
+    expr = ""
+    if year is not None:
+        expr = f"year == {year}"
     if zoom is not None:
         expr += f" and z == {zoom}"
 
