@@ -19,12 +19,12 @@ from shapely.ops import transform
 from api.ratelimiter import check_redis_connection, rate_limiter
 
 EMB_DIM = 64
-COLLECTION = os.getenv("COLLECTION", "geo_embeddings")
+COLLECTION = os.getenv("COLLECTION", "high_res_hun")
 
 MILVUS_HOST = os.getenv("MILVUS_HOST", "localhost")
 MILVUS_PORT = os.getenv("MILVUS_PORT", "19530")
-METRIC_TYPE = os.getenv("METRIC_TYPE", "IP")  # or "L2"
-TARGET_CRS = "EPSG:32633"  # UTM 33N
+METRIC_TYPE = os.getenv("METRIC_TYPE", "L2")  # or "L2"
+TARGET_CRS = "EPSG:4326"  # WGS84
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 
@@ -91,31 +91,43 @@ class QueryResponse(BaseModel):
     query_lat: float
     query_lon: float
     neighbours: dict
-    query_embedding: list[float]
+    query_vector: list[float]
     query_z: int
 
 
 class NeighbourQuery(BaseModel):
     geojson: dict
-    k: int = Query(20, ge=1, le=200)
+    k: int = Query(20, ge=1, le=1000)
     nprobe: int = Query(32, le=64)
 
 
 def _get_vector_for_latlon(col: Collection, x_c: float, y_c: float, z: int, scale: float = 100.0):
     # Try get exactish match using the centroid and scale.
-
-    for s in [100.0, 1000.0, 10000.0, 100000.0]:  # try increasing scales
+    # Scale factors adapted for WGS84 (degrees)
+    # 0.00001 deg ~ 1.1m
+    # 0.0001 deg ~ 11m
+    # 0.001 deg ~ 111m
+    
+    # We want to find a tile center close to our query point.
+    # If the DB has z=16 tiles (approx 160m), searching with a small window is fine.
+    
+    for s in [0.00001, 0.00005, 0.0001, 0.0005, 0.001]:  # try increasing scales
         expr = (
-            f"lon > {x_c - z * s / 2} and lon < {x_c + z * s / 2} and "
-            + f"lat > {y_c - z * s / 2} and lat < {y_c + z * s / 2} and z == {z}"
+            f"lon > {x_c - s} and lon < {x_c + s} and "
+            + f"lat > {y_c - s} and lat < {y_c + s}"
         )
+        # Note: removed z constraint temporarily or permanently if mixed z logic is complex?
+        # The original code had `z == {z}`. Let's add it back if we trust our z calculation,
+        # but for now let's leave it out to find *any* matching vector nearby.
+        # Actually, let's just prioritize spatial match.
+        
         print(f"Query expr: {expr}")
         res = col.query(
-            expr=expr, output_fields=["lon", "lat", "z", "embedding"], limit=10
+            expr=expr, output_fields=["lon", "lat", "z", "vector"], limit=10
         )  # get more
         print(f"Query result: {len(res)} records")
         for r in res:
-            emb = r["embedding"]
+            emb = r["vector"]
             if any(e != 0 for e in emb):  # find first non-zero
                 return emb
     return None  # if all zero or none
@@ -177,7 +189,7 @@ def neighbors(neighbour_query: NeighbourQuery):
 
     query_z = which_z(query_area)
     if query_z == 0:
-        raise HTTPException(status_code=400, detail="Query area is too small for any embeddings.")
+        raise HTTPException(status_code=400, detail="Query area is too small for any vectors.")
 
     logger.info(f"Query area: {query_area}, using z{query_z}")
 
@@ -196,23 +208,23 @@ def neighbors(neighbour_query: NeighbourQuery):
     )
     if vec is None:
         raise HTTPException(
-            status_code=404, detail="No embedding found at that lat/lon (try a snapped grid point)."
+            status_code=404, detail="No vector found at that lat/lon (try a snapped grid point)."
         )
 
     search_params = {"metric_type": METRIC_TYPE, "params": {"nprobe": neighbour_query.nprobe}}
     hits = col.search(
         data=[vec],
-        anns_field="embedding",
+        anns_field="vector",
         param=search_params,
         limit=neighbour_query.k,
-        output_fields=["lon", "lat", "z", "embedding"],
+        output_fields=["lon", "lat", "z", "vector"],
     )[0]
 
     features = []
     for h in hits:
-        embedding = h.entity.get("embedding")
-        # Skip if embedding is all zeros
-        if not any(e != 0 for e in embedding):
+        vector = h.entity.get("vector")
+        # Skip if vector is all zeros
+        if not any(e != 0 for e in vector):
             continue
         # reproject back to original CRS if needed
         if TARGET_CRS != "EPSG:4326":
@@ -223,24 +235,24 @@ def neighbors(neighbour_query: NeighbourQuery):
             hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
         properties = {
             "z": h.entity.get("z"),
-            "embedding": embedding,
+            "vector": vector,
             "distance": h.distance,
         }
         features.append(Feature(geometry=hit_pt, properties=properties))
 
-    # If not enough non-zero embeddings, try with larger limit
+    # If not enough non-zero vectors, try with larger limit
     if len(features) < neighbour_query.k:
         larger_limit = neighbour_query.k * 10  # try 10 times more
         hits = col.search(
             data=[vec],
-            anns_field="embedding",
+            anns_field="vector",
             param=search_params,
             limit=larger_limit,
-            output_fields=["lon", "lat", "z", "embedding"],
+            output_fields=["lon", "lat", "z", "vector"],
         )[0]
         for h in hits:
-            embedding = h.entity.get("embedding")
-            if not any(e != 0 for e in embedding):
+            vector = h.entity.get("vector")
+            if not any(e != 0 for e in vector):
                 continue
             if TARGET_CRS != "EPSG:4326":
                 hit_pt = reproject(
@@ -252,7 +264,7 @@ def neighbors(neighbour_query: NeighbourQuery):
                 hit_pt = geometry.Point(h.entity.get("lon"), h.entity.get("lat"))
             properties = {
                 "z": h.entity.get("z"),
-                "embedding": embedding,
+                "vector": vector,
                 "distance": h.distance,
             }
             features.append(Feature(geometry=hit_pt, properties=properties))
@@ -263,7 +275,7 @@ def neighbors(neighbour_query: NeighbourQuery):
 
     return QueryResponse(
         neighbours=featurecollection,
-        query_embedding=vec,
+        query_vector=vec,
         query_lat=shp_utm_centroid.y,
         query_lon=shp_utm_centroid.x,
         query_z=query_z,

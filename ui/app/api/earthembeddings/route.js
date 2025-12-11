@@ -57,7 +57,8 @@ export async function GET(req) {
     // Read service account key from file
     const fs = require('fs');
     const path = require('path');
-    const keyPath = '/home/barczabende/dev/earth-embedding-sandbox-hun/gen-lang-client-0291927848-14f8e1a428bd.json';
+    // Assume we are running from the 'ui' directory, so the project root is '..'
+    const keyPath = path.join(process.cwd(), '..', 'gen-lang-client-0291927848-14f8e1a428bd.json');
     console.log('Key path:', keyPath);
     const key = fs.readFileSync(keyPath, 'utf8');
     console.log('Key loaded successfully, length:', key.length);
@@ -99,7 +100,7 @@ export async function GET(req) {
     const maxValues = maxs ?? Array(bands.length).fill(1);
 
     // Read geojson from file based on area
-    const geojsonPath = `/home/barczabende/dev/earth-embedding-sandbox-hun/${areaParam}.geojson`;
+    const geojsonPath = path.join(process.cwd(), '..', `${areaParam}.geojson`);
     console.log('GeoJSON path:', geojsonPath);
     const gj = JSON.parse(fs.readFileSync(geojsonPath, 'utf8'));
     console.log('GeoJSON loaded successfully');

@@ -750,7 +750,7 @@ export default function EarthEmbeddings() {
                 <input
                   type="range"
                   min={0}
-                  max={200}
+                  max={1000}
                   step={1}
                   value={k}
                   onChange={(e) => setK(parseInt(e.target.value, 10))}
@@ -759,11 +759,11 @@ export default function EarthEmbeddings() {
                 <input
                   type="number"
                   min={0}
-                  max={200}
+                  max={1000}
                   step={1}
                   value={k}
                   onChange={(e) => {
-                    const val = Math.max(0, Math.min(200, Number(e.target.value)));
+                    const val = Math.max(0, Math.min(1000, Number(e.target.value)));
                     console.log("set k", val);
                     setK(val);
                   }}
