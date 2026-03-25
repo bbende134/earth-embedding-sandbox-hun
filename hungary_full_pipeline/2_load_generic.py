@@ -147,7 +147,7 @@ def main():
                 batch_vectors,
                 batch_lats,
                 batch_lons,
-                [2024] * (end - i),  # Year
+                [2021] * (end - i),  # Year
                 [z] * (end - i),  # Zoom
             ]
 

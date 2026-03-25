@@ -8,7 +8,7 @@ from pymilvus import Collection, connections, utility
 
 
 def main():
-    COLLECTION = "high_res_hun"
+    COLLECTION = "high_res_hun_2021"
 
     print("Connecting to Milvus...")
     connections.connect("default", host="localhost", port="19530")

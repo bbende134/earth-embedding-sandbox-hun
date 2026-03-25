@@ -20,10 +20,10 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 # Configuration
-DRIVE_FOLDER = "earth_engine_exports_hun"
-LOCAL_DATA_DIR = "data_hun"
-PROCESSED_DIR = "processed_hun"
-MILVUS_COLLECTION = "high_res_hun"
+DRIVE_FOLDER = "earth_engine_exports_hun_2021"
+LOCAL_DATA_DIR = "data_hun_2021"
+PROCESSED_DIR = "processed_hun_2021"
+MILVUS_COLLECTION = "high_res_hun_2021"
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 # Concurrency Settings
@@ -62,8 +62,12 @@ def authenticate():
             creds = None
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except Exception as e:
+                logger.warning(f"Token refresh failed: {e}. Forcing re-authentication...")
+                creds = None
+        if not creds or not creds.valid:
             if not os.path.exists("credentials.json"):
                 logger.error("credentials.json not found!")
                 return None

@@ -21,7 +21,7 @@ def check_tasks():
     tasks = ee.data.getTaskList()
 
     # Filter for our tasks
-    pipeline_tasks = [t for t in tasks if t["description"].startswith("hun_2024_tile_")]
+    pipeline_tasks = [t for t in tasks if t["description"].startswith("hun_2021_tile_")]
 
     if not pipeline_tasks:
         print("No pipeline tasks found.")

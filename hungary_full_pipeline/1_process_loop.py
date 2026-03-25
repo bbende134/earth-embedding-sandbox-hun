@@ -19,10 +19,10 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 # Configuration
-DRIVE_FOLDER = "earth_engine_exports_hun"
-LOCAL_DATA_DIR = "data_hun"
-PROCESSED_DIR = "processed_hun"
-MILVUS_COLLECTION = "high_res_hun"
+DRIVE_FOLDER = "earth_engine_exports_hun_2021"
+LOCAL_DATA_DIR = "data_hun_2021"
+PROCESSED_DIR = "processed_hun_2021"
+MILVUS_COLLECTION = "high_res_hun_2021"
 SCOPES = ["https://www.googleapis.com/auth/drive"]  # Read/Write to delete files
 
 # Load environment variables from .env
@@ -77,8 +77,12 @@ def authenticate(force_interactive=False):
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except Exception as e:
+                print(f"Warning: Token refresh failed ({e}). Forcing re-authentication...")
+                creds = None
+        if not creds or not creds.valid:
             cred_path = "local_pipeline/credentials.json"
             if not os.path.exists(cred_path):
                 cred_path = "credentials.json"
@@ -350,21 +354,31 @@ def main():
 
                     error_str = str(e)
 
-                    # Only delete the TIF if it's a conversion error (corrupt file)
+                    # Only delete the TIF if it's a corrupt file error
                     # Don't delete for Beam timeout/resource errors (those are processing issues, not file issues)
-                    is_conversion_error = "1_convert_to_zarr.py" in error_str
+                    is_corrupt_file_error = (
+                        "1_convert_to_zarr.py" in error_str or "split_large_tif.py" in error_str
+                    )
                     is_beam_timeout = (
                         "DEADLINE_EXCEEDED" in error_str or "RESOURCE_EXHAUSTED" in error_str
                     )
 
                     if (
                         "returned non-zero exit status" in error_str
-                        and is_conversion_error
+                        and is_corrupt_file_error
                         and not is_beam_timeout
                     ):
                         if os.path.exists(local_path):
                             print(f"Deleting potentially corrupt file: {local_path}")
                             os.remove(local_path)
+                            # Clean up partial quarter files from split attempt
+                            for quadrant in ["NW", "NE", "SW", "SE"]:
+                                for ext in [".tif", ".tif.ovr.tmp"]:
+                                    q_path = os.path.join(
+                                        LOCAL_DATA_DIR, f"{tile_name}_{quadrant}{ext}"
+                                    )
+                                    if os.path.exists(q_path):
+                                        os.remove(q_path)
                             # Also clean up partial Zarr if it exists
                             if os.path.exists(zarr_raw):
                                 shutil.rmtree(zarr_raw, ignore_errors=True)

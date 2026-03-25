@@ -195,3 +195,5 @@ credentials.json
 *.tiff
 
 /processed_hun
+
+processed_hun*/*

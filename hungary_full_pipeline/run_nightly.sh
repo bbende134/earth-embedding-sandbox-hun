@@ -67,20 +67,13 @@ TASK_STATUS=$?
 
 if [ $TASK_STATUS -eq 0 ]; then
     echo "Tasks are finished or none found. Checking if we need to submit..."
-    # Optional: We could check if we *should* submit. 
-    # But for now, let's assume if no tasks are running, we might want to submit OR just process.
-    # The user said "if finished, just access google drive".
-    # This implies we assume exports were already submitted.
-    # But if it's a fresh run, we need to submit.
-    # Let's add a prompt or just submit if NO tasks found at all?
-    # check_ee_tasks returns 0 if NO tasks found too.
-    
-    # Safe approach: Always run export script, but export script should be idempotent?
-    # EE export script submits new tasks. We don't want duplicates.
-    
-    # Let's rely on the user's intent: "currently all the earth engine processing finished"
-    # So we skip export.
-    echo "Assuming exports are done. Skipping submission."
+    read -p "Do you want to submit a new Earth Engine export grid? (Y/N): " submit_confirm
+    if [[ "$submit_confirm" == "Y" || "$submit_confirm" == "y" ]]; then
+        echo "Submitting full export grid..."
+        uv run python hungary_full_pipeline/0_export_grid.py
+    else
+        echo "Assuming exports are done. Skipping submission."
+    fi
 else
     echo "Tasks are currently RUNNING. Skipping submission to avoid duplicates."
 fi

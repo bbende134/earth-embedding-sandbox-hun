@@ -45,7 +45,8 @@ def split_tif(input_path, output_dir):
         output_path = os.path.join(output_dir, f"{base_name}_{quadrant}.tif")
 
         print(f"  Writing {quadrant} quarter to {output_path}...")
-        quarter.rio.to_raster(output_path, driver="COG", compress="LZW")
+        quarter.load()
+        quarter.rio.to_raster(output_path, driver="GTiff", compress="LZW")
 
         output_paths.append(output_path)
 
@@ -56,7 +57,9 @@ def split_tif(input_path, output_dir):
 def main():
     parser = argparse.ArgumentParser(description="Split large 50km TIF into 25km quarters")
     parser.add_argument("--input", required=True, help="Path to large TIF file")
-    parser.add_argument("--output-dir", default="data_hun", help="Output directory for quarters")
+    parser.add_argument(
+        "--output-dir", default="data_hun_2021", help="Output directory for quarters"
+    )
     args = parser.parse_args()
 
     # Create output directory
