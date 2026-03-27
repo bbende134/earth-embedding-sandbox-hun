@@ -8,22 +8,22 @@ def main():
     parser.add_argument("--limit", type=int, default=5, help="Number of records to fetch")
     args = parser.parse_args()
 
-    COLLECTION_NAME = "high_res_hun_2021"
+    collection_name = "high_res_hun_2018"
 
     print("Connecting to Milvus on localhost:19530...")
     connections.connect("default", host="localhost", port="19530")
 
-    if not utility.has_collection(COLLECTION_NAME):
-        print(f"ERROR: Collection '{COLLECTION_NAME}' does not exist!")
+    if not utility.has_collection(collection_name):
+        print(f"ERROR: Collection '{collection_name}' does not exist!")
         return
 
     # Load the collection into memory for searching/querying
-    col = Collection(COLLECTION_NAME)
+    col = Collection(collection_name)
     col.load()
 
     # Check total embedded entities
     total_count = col.num_entities
-    print(f"\nTotal loaded rows in {COLLECTION_NAME}: {total_count}")
+    print(f"\nTotal loaded rows in {collection_name}: {total_count}")
 
     if total_count == 0:
         print("Collection is currently empty.")
@@ -40,8 +40,11 @@ def main():
     results = col.query(expr="id >= 0", output_fields=output_fields, limit=args.limit)
 
     for item in results:
+        year = item["year"]
+        z = item["z"]
         print(
-            f"ID: {item['id']} | Lat: {item['lat']:.4f}, Lon: {item['lon']:.4f} | Year: {item['year']} | Zoom: {item['z']}"
+            f"ID: {item['id']} | Lat: {item['lat']:.4f}, Lon: {item['lon']:.4f} | "
+            f"Year: {year} | Zoom: {z}"
         )
 
     # If you also want to inspect the actual 64-dim float32 vector itself:

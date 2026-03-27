@@ -1,0 +1,19 @@
+{
+  "submitted_at": "2026-03-27T22:43:34.572528+00:00",
+  "geojson": "budapest.geojson",
+  "drive_folder": "ee_multimodal_exports",
+  "tiles": {
+    "s2l2a_2017-03-29_tile_000": {
+      "task_id": "J3VSJAOABSDE5X5H67UTJQUS",
+      "sensor": "s2l2a",
+      "acquisition_date": "2017-03-29",
+      "bbox": [
+        17.0,
+        46.5,
+        17.225,
+        46.725
+      ],
+      "tile_idx": 0
+    }
+  }
+}

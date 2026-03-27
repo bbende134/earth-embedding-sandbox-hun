@@ -7,6 +7,7 @@ Generates a coverage map PNG showing what has been successfully processed and lo
 
 import argparse
 import os
+import time
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -36,7 +37,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--geojson", default="hungary.geojson", help="Path to boundary")
     parser.add_argument("--collection", default="high_res_hun_2021", help="Milvus collection")
-    parser.add_argument("--output", default="debug/coverage_2021.png", help="Output PNG path")
+    parser.add_argument("--output", default="debug/coverage_2018.png", help="Output PNG path")
     args = parser.parse_args()
 
     if not os.path.exists(args.geojson):
@@ -51,9 +52,28 @@ def main():
         print(f"ERROR: Collection {args.collection} does not exist yet!")
         return
 
+    # Release all other loaded collections to free memory
+    for other in utility.list_collections():
+        if other != args.collection:
+            other_state = str(utility.load_state(other))
+            if "NotLoad" not in other_state:
+                print(f"Releasing {other} to free memory...")
+                Collection(other).release()
+
     col = Collection(args.collection)
-    col.load()
-    print(f"Collection loaded. Total entities: {col.num_entities}")
+    print("Waiting for collection to be ready...")
+    for _attempt in range(20):
+        load_state = str(utility.load_state(args.collection))
+        print(f"  Load state: {load_state}")
+        if "Loaded" in load_state:
+            break
+        if "NotLoad" in load_state:
+            col.load()
+        time.sleep(10)
+    else:
+        print("ERROR: Collection not ready after 200s. Aborting.")
+        return
+    print(f"Total entities: {col.num_entities}")
 
     # 2. Recreate the Grid
     print("Recreating export grid...")
@@ -108,9 +128,11 @@ def main():
         covered_gdf = gpd.GeoDataFrame({"geometry": covered_tiles}, crs=gdf.crs)
         covered_gdf.plot(ax=ax, color="green", alpha=0.5, edgecolor="darkgreen", label="Loaded")
 
-    plt.title(
-        f"Milvus Collection Coverage: {args.collection}\nLoaded: {len(covered_tiles)} / {len(tiles)} tiles"
+    title = (
+        f"Milvus Collection Coverage: {args.collection}\n"
+        f"Loaded: {len(covered_tiles)} / {len(tiles)} tiles"
     )
+    plt.title(title)
 
     # Custom legend
     import matplotlib.patches as mpatches

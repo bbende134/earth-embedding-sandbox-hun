@@ -8,16 +8,16 @@ from pymilvus import Collection, connections, utility
 
 
 def main():
-    COLLECTION = "high_res_hun_2021"
+    collection = "high_res_hun_2018"
 
     print("Connecting to Milvus...")
     connections.connect("default", host="localhost", port="19530")
 
-    if not utility.has_collection(COLLECTION):
-        print(f"ERROR: Collection {COLLECTION} does not exist!")
+    if not utility.has_collection(collection):
+        print(f"ERROR: Collection {collection} does not exist!")
         sys.exit(1)
 
-    col = Collection(COLLECTION)
+    col = Collection(collection)
     col.load()
 
     count = col.num_entities

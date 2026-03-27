@@ -21,7 +21,7 @@ def check_tasks():
     tasks = ee.data.getTaskList()
 
     # Filter for our tasks
-    pipeline_tasks = [t for t in tasks if t["description"].startswith("hun_2021_tile_")]
+    pipeline_tasks = [t for t in tasks if t["description"].startswith("hun_2018_tile_")]
 
     if not pipeline_tasks:
         print("No pipeline tasks found.")
@@ -31,9 +31,11 @@ def check_tasks():
     failed = [t for t in pipeline_tasks if t["state"] == "FAILED"]
     completed = [t for t in pipeline_tasks if t["state"] == "COMPLETED"]
 
-    print(
-        f"Tasks Status: {len(running)} RUNNING/READY, {len(completed)} COMPLETED, {len(failed)} FAILED"
+    status_msg = (
+        f"Tasks Status: {len(running)} RUNNING/READY, {len(completed)} COMPLETED, "
+        f"{len(failed)} FAILED"
     )
+    print(status_msg)
 
     if running:
         print("Pipeline is still running.")

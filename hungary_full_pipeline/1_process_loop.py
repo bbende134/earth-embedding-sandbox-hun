@@ -12,6 +12,7 @@ import subprocess
 import sys
 import time
 
+from dotenv import load_dotenv
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -19,16 +20,17 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 # Configuration
-DRIVE_FOLDER = "earth_engine_exports_hun_2021"
-LOCAL_DATA_DIR = "data_hun_2021"
-PROCESSED_DIR = "processed_hun_2021"
-MILVUS_COLLECTION = "high_res_hun_2021"
+DRIVE_FOLDER = "earth_engine_exports_hun_2018"
+LOCAL_DATA_DIR = "data_hun_2018"
+PROCESSED_DIR = "processed_hun_2018"
+MILVUS_COLLECTION = "high_res_hun_2018"
 SCOPES = ["https://www.googleapis.com/auth/drive"]  # Read/Write to delete files
 
 # Load environment variables from .env
-from dotenv import load_dotenv
-
 load_dotenv()
+
+# Size threshold for splitting tiles (MB)
+LARGE_TILE_SIZE_MB = 500
 
 
 def authenticate(force_interactive=False):
@@ -45,7 +47,7 @@ def authenticate(force_interactive=False):
             import google.auth
 
             creds, _project_id = google.auth.default(scopes=SCOPES)
-            # Check if we actually got valid credentials (sometimes default() returns anonymous if not found)
+            # Check if we got valid creds (default() returns anonymous if creds not found)
             if creds and hasattr(creds, "service_account_email"):
                 print(f"Using Service Account: {creds.service_account_email}")
                 return creds
@@ -152,9 +154,9 @@ def process_tile(tile_path):
     """Run the processing pipeline for a single tile."""
     tile_name = os.path.basename(tile_path).replace(".tif", "")
 
-    # Check if this is a large tile that needs splitting (>500MB)
+    # Check if this is a large tile that needs splitting
     file_size_mb = os.path.getsize(tile_path) / (1024 * 1024)
-    if file_size_mb > 500:
+    if file_size_mb > LARGE_TILE_SIZE_MB:
         print(f"\n--- Large tile detected ({file_size_mb:.1f}MB): {tile_name} ---")
         print("Splitting into quarters to avoid Beam gRPC limit...")
 
@@ -237,9 +239,11 @@ def process_single_tile(tile_path):
             except subprocess.CalledProcessError:
                 if attempt < max_retries - 1:
                     wait_time = 2**attempt  # Exponential backoff: 1s, 2s, 4s
-                    print(
-                        f"Consolidation failed (attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s..."
+                    msg = (
+                        f"Consolidation failed (attempt {attempt + 1}/{max_retries}). "
+                        f"Retrying in {wait_time}s..."
                     )
+                    print(msg)
                     time.sleep(wait_time)
                 else:
                     print(f"Consolidation failed after {max_retries} attempts. Skipping this tile.")
@@ -354,8 +358,8 @@ def main():
 
                     error_str = str(e)
 
-                    # Only delete the TIF if it's a corrupt file error
-                    # Don't delete for Beam timeout/resource errors (those are processing issues, not file issues)
+                    # Only delete TIF if corrupt. Beam timeout/resource errors are
+                    # processing issues, not file issues, so keep file for manual retry.
                     is_corrupt_file_error = (
                         "1_convert_to_zarr.py" in error_str or "split_large_tif.py" in error_str
                     )
@@ -383,9 +387,7 @@ def main():
                             if os.path.exists(zarr_raw):
                                 shutil.rmtree(zarr_raw, ignore_errors=True)
                     elif is_beam_timeout:
-                        print(
-                            "Beam timeout/resource error - keeping file for manual retry or debugging"
-                        )
+                        print("Beam timeout/resource error - keeping file for debugging")
                         # Clean up partial outputs but keep the source TIF
                         if os.path.exists(zarr_raw):
                             shutil.rmtree(zarr_raw, ignore_errors=True)
