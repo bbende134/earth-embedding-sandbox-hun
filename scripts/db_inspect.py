@@ -37,7 +37,7 @@ for collection_name in collections:
     if has_year:
         try:
             res = collection.query(expr="year >= 0", output_fields=["year"])
-            years = sorted(list(set(r["year"] for r in res)))
+            years = sorted({r["year"] for r in res})
             print(f"Available years: {years}")
         except Exception as e:
             print(f"Could not query years: {e}")
@@ -174,6 +174,8 @@ else:
 # %%
 # Plot the query location and its similar neighbors on a map
 
+import os
+
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -243,8 +245,8 @@ if random_results and results:
     plt.grid(True, linestyle="--", alpha=0.3)
 
     # Auto-adjust limits to show all points with margin
-    all_lons = similar_lons + [query_lon]
-    all_lats = similar_lats + [query_lat]
+    all_lons = [*similar_lons, query_lon]
+    all_lats = [*similar_lats, query_lat]
     margin = 0.05
     ax.set_xlim(min(all_lons) - margin, max(all_lons) + margin)
     ax.set_ylim(min(all_lats) - margin, max(all_lats) + margin)

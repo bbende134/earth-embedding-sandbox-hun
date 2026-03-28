@@ -29,6 +29,8 @@ dependencies = [
     "google-auth-oauthlib>=1.2.2",
     "python-dotenv>=1.0.1",
     "scipy>=1.16.3",
+    "pystac-client>=0.9.0",
+    "planetary-computer>=1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -83,6 +85,14 @@ ignore = [
     # parameters for FastAPI
     "B008",
     "N999", # leading digits for pipeline steps
+    "PLR0912", # Too many branches - these are complex processing functions
+    "PLR0913", # Too many arguments - often necessary for data processing
+    "PLR0915", # Too many statements - same reason as above
+    "PLR2004", # Magic values - domain-specific constants
+    "RUF003", # Ambiguous unicode characters in comments
+    "PLW0603", # Global statements necessary for lazy initialization
+    "E402", # Module-level imports not at top (Jupyter-style scripts)
+    "E501", # Line too long - complex data processing pipelines
 ]
 
 [tool.ruff.lint.flake8-bugbear]

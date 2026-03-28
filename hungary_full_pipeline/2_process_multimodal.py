@@ -1,26 +1,23 @@
 """
-Step 2: Process a single-sensor GeoTIFF through TerraMind API and load into Milvus.
+Step 2: Process an annual stacked GeoTIFF through TerraMind API and load into Milvus.
 
-Filename encodes the sensor and acquisition date:
-  s2l2a_{YYYY-MM-DD}_tile_{i:03d}.tif  ->  untok_sen2l2a@224  (12 bands: B1..B12)
-  s1grd_{YYYY-MM-DD}_tile_{i:03d}.tif  ->  untok_sen1grd@224  ( 2 bands: VV, VH)
+Filename: {sensor}_{YYYY}_tile_{i:03d}[shard-suffix].tif
+  s2l2a_2017_tile_000.tif             -> untok_sen2l2a@224
+  s1grd_2021_tile_000-0000-0000.tif   -> untok_sen1grd@224  (shard)
+
+Band names in TIF (from EE toBands()): '{image_idx}_{YYYYMMDD}_{band}'
+  e.g. '0_20170329_B1', '1_20170403_B1', ...
+
+Processing:
+  1. Parse sensor from filename
+  2. Read band descriptions -> group band indices by acquisition date
+  3. For each date: slice bands, tile into 224x224 patches, call /infer per patch
+  4. Store embeddings in dyn_terra, tokens in dyn_terra_tokens
 
 S2 band order (TerraMind expects exactly this sequence):
-  0: B1  (Coastal Aerosol 60m)
-  1: B2  (Blue 10m)
-  2: B3  (Green 10m)
-  3: B4  (Red 10m)
-  4: B5  (Vegetation Red Edge 1 20m)
-  5: B6  (Vegetation Red Edge 2 20m)
-  6: B7  (Vegetation Red Edge 3 20m)
-  7: B8  (NIR 10m)
-  8: B8A (Narrow NIR 20m)
-  9: B9  (Water Vapor 60m)
-  10: B11 (SWIR 1 20m)
-  11: B12 (SWIR 2 20m)
+  B1, B2, B3, B4, B5, B6, B7, B8, B8A, B9, B11, B12
 
-NDVI (B8-B4)/(B8+B4) is derived from S2 bands and stored as a mean-patch scalar.
-VQ-VAE tokens (when returned) are stored in dyn_terra_tokens.
+NDVI (B8-B4)/(B8+B4) is stored as a mean-patch scalar alongside S2 embeddings.
 """
 
 import argparse
@@ -41,23 +38,23 @@ PATCH_SIZE = 224
 MAX_WORKERS = 8
 EMBEDDING_DIM = 1024
 
-# Sensor name (from filename prefix) → API modality key
 SENSOR_MODALITY = {
     "s2l2a": "untok_sen2l2a@224",
     "s1grd": "untok_sen1grd@224",
 }
 
-# S2 band indices for NDVI: B8=index 7, B4=index 3
-NDVI_B8_IDX = 7
-NDVI_B4_IDX = 3
+# Expected band order per sensor (must match TerraMind API input)
+SENSOR_BAND_ORDER = {
+    "s2l2a": ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B8A", "B9", "B11", "B12"],
+    "s1grd": ["VV", "VH"],
+}
 
+# S2 band indices within SENSOR_BAND_ORDER["s2l2a"] for NDVI
+NDVI_B8_IDX = 7  # B8  (NIR)
+NDVI_B4_IDX = 3  # B4  (Red)
 NO_NDVI = -999.0  # sentinel for non-S2 rows
 
-# Threshold for skipping zero-padded patches (>50% zeros)
-ZERO_PADDING_THRESHOLD = 0.5
-
-# Number of dimensions for 2D arrays
-NDIM_2D = 2
+TOKEN_DIM = 196  # 14x14 VQ-VAE grid, flattened
 
 
 # ---------------------------------------------------------------------------
@@ -66,7 +63,6 @@ NDIM_2D = 2
 
 
 def get_or_create_embedding_collection(name):
-    """One row per (patch x modality). Includes ndvi scalar for S2 rows."""
     if utility.has_collection(name):
         return Collection(name)
     fields = [
@@ -92,11 +88,7 @@ def get_or_create_embedding_collection(name):
     return coll
 
 
-TOKEN_DIM = 196  # 14x14 VQ-VAE grid, flattened
-
-
 def get_or_create_token_collection(name):
-    """One row per (patch x tokenizer-modality). embedding_id -> dyn_terra.id."""
     if utility.has_collection(name):
         return Collection(name)
     fields = [
@@ -126,20 +118,57 @@ def get_or_create_token_collection(name):
 
 
 # ---------------------------------------------------------------------------
-# Filename parsing
+# Filename / band parsing
 # ---------------------------------------------------------------------------
 
 
-def parse_filename(path: str) -> tuple[str, str]:
-    """Returns (sensor, acquisition_date) from filename like s2l2a_2021-05-15_tile_003.tif."""
+def parse_filename(path: str) -> tuple[str, int]:
+    """
+    Returns (sensor, year) from filenames like:
+      s2l2a_2017_tile_000.tif
+      s1grd_2021_tile_000-0000000000-0000000000.tif  (sharded)
+    """
     name = os.path.basename(path)
-    m = re.match(r"^(s2l2a|s1grd)_(\d{4}-\d{2}-\d{2})_tile_\d+", name)
+    m = re.match(r"^(s2l2a|s1grd)_(\d{4})_tile_\d+", name)
     if not m:
         raise ValueError(
-            f"Cannot parse sensor/date from filename: {name}\n"
-            "Expected format: {{sensor}}_{{YYYY-MM-DD}}_tile_{{NNN}}.tif"
+            f"Cannot parse sensor/year from filename: {name}\n"
+            "Expected: {{sensor}}_{{YYYY}}_tile_{{NNN}}[shard].tif"
         )
-    return m.group(1), m.group(2)
+    return m.group(1), int(m.group(2))
+
+
+def parse_band_date_groups(descriptions: tuple, sensor: str) -> dict[str, list[int]]:
+    """
+    Parse GeoTIFF band descriptions (from EE toBands()) into date -> [band_indices].
+
+    EE toBands() names bands as '{image_idx}_{YYYYMMDD}_{band}'.
+    Returns dict: 'YYYY-MM-DD' -> ordered list of src band indices
+    matching SENSOR_BAND_ORDER[sensor].
+    """
+    band_order = SENSOR_BAND_ORDER[sensor]
+    date_band_map: dict[str, dict[str, int]] = {}  # date -> {band_name: src_idx}
+
+    for src_idx, desc in enumerate(descriptions):
+        if not desc:
+            continue
+        parts = desc.split("_")
+        if len(parts) < 3:
+            continue
+        # parts: [image_idx, YYYYMMDD, band_name]
+        yyyymmdd = parts[1]
+        band_name = parts[2]
+        date_str = f"{yyyymmdd[:4]}-{yyyymmdd[4:6]}-{yyyymmdd[6:8]}"
+
+        date_band_map.setdefault(date_str, {})[band_name] = src_idx
+
+    result = {}
+    for date_str, band_dict in date_band_map.items():
+        indices = [band_dict[b] for b in band_order if b in band_dict]
+        if len(indices) == len(band_order):
+            result[date_str] = indices
+        # else: skip dates with incomplete band coverage
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -148,7 +177,7 @@ def parse_filename(path: str) -> tuple[str, str]:
 
 
 def bands_to_tif_bytes(band_data: np.ndarray, transform: Affine, crs) -> bytes:
-    if band_data.ndim == NDIM_2D:
+    if band_data.ndim == 2:
         band_data = band_data[np.newaxis]
     n_bands, h, w = band_data.shape
     with MemoryFile() as mem:
@@ -166,7 +195,6 @@ def bands_to_tif_bytes(band_data: np.ndarray, transform: Affine, crs) -> bytes:
 
 
 def call_infer_single(modality_key: str, tif_bytes: bytes, api_url: str) -> dict:
-    """POST a single modality to /infer. Returns that modality's result dict."""
     resp = requests.post(
         f"{api_url}/infer",
         data=[("modality", modality_key)],
@@ -185,7 +213,7 @@ def call_infer_single(modality_key: str, tif_bytes: bytes, api_url: str) -> dict
 def process_patch(
     patch_row: int,
     patch_col: int,
-    src_data: np.ndarray,
+    date_data: np.ndarray,  # (n_bands, H, W) — already sliced to this date's bands
     src_transform: Affine,
     src_crs,
     sensor: str,
@@ -194,22 +222,19 @@ def process_patch(
     tile_id: str,
     api_url: str,
 ) -> dict | None:
-    """
-    Returns a result dict for one patch, or None if the patch is mostly NoData.
-    """
     row_off = patch_row * PATCH_SIZE
     col_off = patch_col * PATCH_SIZE
 
-    patch = src_data[:, row_off : row_off + PATCH_SIZE, col_off : col_off + PATCH_SIZE]
+    patch = date_data[:, row_off : row_off + PATCH_SIZE, col_off : col_off + PATCH_SIZE]
 
-    # Skip patches that are majority zero-padding
-    if (patch == 0.0).mean() > ZERO_PADDING_THRESHOLD:
+    # Skip majority-zero patches (edge padding or missing data)
+    if (patch == 0.0).mean() > 0.5:
         return None
 
     patch_transform = src_transform * Affine.translation(col_off, row_off)
     lon, lat = transform_xy(src_transform, row_off + PATCH_SIZE // 2, col_off + PATCH_SIZE // 2)
 
-    # Compute NDVI for S2 patches
+    # Compute NDVI for S2
     ndvi = NO_NDVI
     if sensor == "s2l2a":
         b8 = patch[NDVI_B8_IDX].astype(np.float32)
@@ -227,7 +252,7 @@ def process_patch(
         return None
 
     emb = np.array(mod_data["embeddings"])  # (1, 196, 1024)
-    vector = emb[0].mean(axis=0).tolist()  # mean-pool spatial dim → (1024,)
+    vector = emb[0].mean(axis=0).tolist()  # mean-pool -> (1024,)
 
     tokens = None
     if mod_data.get("tokens") is not None:
@@ -302,7 +327,7 @@ def insert_tokens(coll: Collection, rows: list[dict], embedding_ids: list[int]):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", required=True, help="Path to sensor GeoTIFF")
+    parser.add_argument("--input", required=True, help="Path to annual stacked GeoTIFF")
     parser.add_argument("--api-url", default=API_URL)
     parser.add_argument("--collection", default="dyn_terra")
     parser.add_argument("--token-collection", default="dyn_terra_tokens")
@@ -313,13 +338,15 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    sensor, date_str = parse_filename(args.input)
+    sensor, year = parse_filename(args.input)
     modality_key = SENSOR_MODALITY[sensor]
-    tile_id = os.path.basename(args.input).replace(".tif", "")
+    # tile_id strips shard suffix: s2l2a_2017_tile_000-0000-0000 -> s2l2a_2017_tile_000
+    base_name = os.path.basename(args.input).replace(".tif", "")
+    tile_id = re.sub(r"-\d{10}-\d{10}$", "", base_name)
 
     print(f"File:     {args.input}")
-    print(f"Sensor:   {sensor}  →  {modality_key}")
-    print(f"Date:     {date_str}")
+    print(f"Sensor:   {sensor}  ->  {modality_key}")
+    print(f"Year:     {year}")
     print(f"Tile ID:  {tile_id}")
 
     if not args.dry_run:
@@ -331,11 +358,19 @@ def main():
     print(f"Opening {args.input}...")
     with rasterio.open(args.input) as src:
         print(f"  {src.width}x{src.height}px, {src.count} bands, CRS: {src.crs}")
+        descriptions = src.descriptions
         src_data = src.read().astype(np.float32)
         src_transform = src.transform
         src_crs = src.crs
 
-    # Pad to next multiple of PATCH_SIZE so edge patches aren't dropped
+    # Parse date -> band_indices from GeoTIFF band descriptions
+    date_band_groups = parse_band_date_groups(descriptions, sensor)
+    if not date_band_groups:
+        print("ERROR: Could not parse any dates from band descriptions. Aborting.")
+        return
+    print(f"  {len(date_band_groups)} acquisition dates found in file")
+
+    # Pad spatial dims to PATCH_SIZE multiples
     _, h, w = src_data.shape
     pad_h = (PATCH_SIZE - h % PATCH_SIZE) % PATCH_SIZE
     pad_w = (PATCH_SIZE - w % PATCH_SIZE) % PATCH_SIZE
@@ -347,39 +382,48 @@ def main():
     n_rows = src_data.shape[1] // PATCH_SIZE
     n_cols = src_data.shape[2] // PATCH_SIZE
     patch_coords = [(r, c) for r in range(n_rows) for c in range(n_cols)]
-    print(f"  {n_rows}x{n_cols} = {len(patch_coords)} patches")
+    total_calls = len(date_band_groups) * len(patch_coords)
+    print(
+        f"  {n_rows}x{n_cols} = {len(patch_coords)} patches x {len(date_band_groups)} dates = {total_calls} API calls"
+    )
 
     all_rows: list[dict] = []
     failed = 0
 
-    with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
-        futures = {
-            executor.submit(
-                process_patch,
-                r,
-                c,
-                src_data,
-                src_transform,
-                src_crs,
-                sensor,
-                modality_key,
-                date_str,
-                tile_id,
-                args.api_url,
-            ): (r, c)
-            for r, c in patch_coords
-        }
-        for i, future in enumerate(as_completed(futures)):
-            r, c = futures[future]
-            try:
-                row = future.result()
-                if row:
-                    all_rows.append(row)
-            except Exception as e:
-                failed += 1
-                print(f"\nPatch ({r},{c}) failed: {e}")
-            if (i + 1) % 50 == 0 or (i + 1) == len(futures):
-                print(f"  {i + 1}/{len(futures)} patches, {len(all_rows)} rows so far", end="\r")
+    for date_idx, (date_str, band_indices) in enumerate(sorted(date_band_groups.items())):
+        date_data = src_data[band_indices]  # (n_bands_for_sensor, H, W)
+
+        with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
+            futures = {
+                executor.submit(
+                    process_patch,
+                    r,
+                    c,
+                    date_data,
+                    src_transform,
+                    src_crs,
+                    sensor,
+                    modality_key,
+                    date_str,
+                    tile_id,
+                    args.api_url,
+                ): (r, c)
+                for r, c in patch_coords
+            }
+            for future in as_completed(futures):
+                r, c = futures[future]
+                try:
+                    row = future.result()
+                    if row:
+                        all_rows.append(row)
+                except Exception as e:
+                    failed += 1
+                    print(f"\nPatch ({r},{c}) date={date_str} failed: {e}")
+
+        print(
+            f"  [{date_idx + 1}/{len(date_band_groups)}] {date_str}  rows so far: {len(all_rows)}",
+            end="\r",
+        )
 
     print(f"\n  Done: {len(all_rows)} rows ({failed} patches failed)")
 

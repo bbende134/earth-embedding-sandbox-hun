@@ -179,7 +179,7 @@ def main():
             valid_files = [
                 f
                 for f in tif_files
-                if re.match(r"^(s2l2a|s1grd)_\d{4}-\d{2}-\d{2}_tile_\d+\.tif$", f["name"])
+                if re.match(r"^(s2l2a|s1grd)_\d{4}_tile_\d+(-\d+-\d+)?\.tif$", f["name"])
             ]
             stale_files = [f for f in tif_files if f not in valid_files]
             for f in stale_files:

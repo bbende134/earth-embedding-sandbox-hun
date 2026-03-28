@@ -1,17 +1,25 @@
 {
-  "submitted_at": "2026-03-27T22:43:34.572528+00:00",
+  "submitted_at": "2026-03-27T22:59:18.574066+00:00",
   "geojson": "budapest.geojson",
   "drive_folder": "ee_multimodal_exports",
   "tiles": {
-    "s2l2a_2017-03-29_tile_000": {
-      "task_id": "J3VSJAOABSDE5X5H67UTJQUS",
+    "s2l2a_2021_tile_000": {
+      "task_id": "YXAWDS5JSCT3X3VFD5AUYTHH",
       "sensor": "s2l2a",
-      "acquisition_date": "2017-03-29",
+      "year": 2021,
+      "dates": [
+        "2021-06-01",
+        "2021-06-06",
+        "2021-06-11",
+        "2021-06-16",
+        "2021-06-21",
+        "2021-06-26"
+      ],
       "bbox": [
-        17.0,
-        46.5,
-        17.225,
-        46.725
+        17.04,
+        46.54,
+        17.060000000000002,
+        46.559999999999995
       ],
       "tile_idx": 0
     }

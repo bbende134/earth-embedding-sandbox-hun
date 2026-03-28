@@ -37,7 +37,7 @@ def check_ee_tasks(tile_manifest: dict) -> dict:
         all_tasks = ee.data.listOperations()
     except Exception as e:
         print(f"Warning: Could not fetch EE tasks: {e}")
-        return {name: "UNKNOWN" for name in tile_manifest}
+        return dict.fromkeys(tile_manifest, "UNKNOWN")
 
     task_map = {t["name"].split("/")[-1]: t for t in all_tasks}
 
@@ -114,7 +114,7 @@ def main():
 
     # --- EE status ---
     if args.skip_ee:
-        ee_status = {name: "SKIPPED" for name in tile_names}
+        ee_status = dict.fromkeys(tile_names, "SKIPPED")
     else:
         print("Checking Earth Engine task statuses...")
         ee_status = check_ee_tasks(tile_manifest)

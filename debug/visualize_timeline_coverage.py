@@ -1,63 +1,73 @@
 #!/usr/bin/env python3
 """
-Visualize timeline coverage: EE-available acquisitions vs. Milvus-processed ones.
+Visualize timeline coverage: STAC-available acquisitions vs. Milvus-processed ones.
 
 For each sensor/modality, queries:
-  - Earth Engine: all unique acquisition dates in the date range
+  - Planetary Computer STAC: all unique acquisition dates in the date range
   - Milvus dyn_terra: all unique dates already processed
 
 Generates a horizontal timeline plot:
   green  = processed in Milvus
-  red    = available in EE but not yet processed
+  red    = available in STAC but not yet processed
   Y-axis = modality (s2l2a / s1grd)
 """
 
 import argparse
+import os
 from datetime import datetime
 
-import ee
 import geopandas as gpd
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import pystac_client
 from pymilvus import Collection, connections, utility
+from tqdm import tqdm
 
 DEFAULT_GEOJSON = "budapest.geojson"
-DEFAULT_START = "2017-03-28"
+DEFAULT_START = "2017-01-01"
 DEFAULT_END = "2026-03-27"
 DEFAULT_OUTPUT = "debug/timeline_coverage.png"
 
-EE_SENSORS = {
+STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
+
+SENSORS = {
     "s2l2a": {
-        "collection": "COPERNICUS/S2_SR_HARMONIZED",
+        "stac_collection": "sentinel-2-l2a",
         "modality": "untok_sen2l2a@224",
-        "extra_filter": None,
+        "cloud_filter": True,
+        "cloud_max": 80,
         "color": "#4e9af1",
     },
     "s1grd": {
-        "collection": "COPERNICUS/S1_GRD",
+        "stac_collection": "sentinel-1-rtc",
         "modality": "untok_sen1grd@224",
-        "extra_filter": ("instrumentMode", "IW"),  # built after ee.Initialize()
+        "cloud_filter": False,
+        "cloud_max": None,
         "color": "#f1a24e",
     },
 }
 
 
 # ---------------------------------------------------------------------------
-# EE helpers
+# STAC helpers
 # ---------------------------------------------------------------------------
 
 
-def fetch_ee_dates(sensor_cfg: dict, roi_ee, start_date: str, end_date: str) -> set[str]:
-    col = (
-        ee.ImageCollection(sensor_cfg["collection"])
-        .filterBounds(roi_ee)
-        .filterDate(start_date, end_date)
-    )
-    if sensor_cfg["extra_filter"]:
-        k, v = sensor_cfg["extra_filter"]
-        col = col.filter(ee.Filter.eq(k, v))
-    timestamps = col.aggregate_array("system:time_start").getInfo()
-    return {datetime.utcfromtimestamp(t / 1000).strftime("%Y-%m-%d") for t in timestamps}
+def fetch_stac_dates(sensor_cfg, bbox, start_date, end_date):
+    catalog = pystac_client.Client.open(STAC_URL)
+    search_kwargs = {
+        "collections": [sensor_cfg["stac_collection"]],
+        "bbox": bbox,
+        "datetime": f"{start_date}/{end_date}",
+    }
+    if sensor_cfg["cloud_filter"]:
+        search_kwargs["query"] = {"eo:cloud_cover": {"lt": sensor_cfg["cloud_max"]}}
+
+    items = list(catalog.search(**search_kwargs).item_collection())
+    dates = set()
+    for item in items:
+        dates.add(item.datetime.strftime("%Y-%m-%d"))
+    return dates
 
 
 # ---------------------------------------------------------------------------
@@ -65,28 +75,42 @@ def fetch_ee_dates(sensor_cfg: dict, roi_ee, start_date: str, end_date: str) -> 
 # ---------------------------------------------------------------------------
 
 
-def fetch_milvus_dates(collection: str, modality: str, host: str, port: str) -> set[str]:
+def fetch_milvus_dates(collection, modality, host, port):
     connections.connect("default", host=host, port=port)
     if not utility.has_collection(collection):
         return set()
-    coll = Collection(collection)
-    coll.load()
 
-    dates: set[str] = set()
-    offset = 0
-    batch_size = 16384
+    coll = Collection(collection)
+
+    # Wait for collection to be queryable
+    load_state = str(utility.load_state(collection))
+    if "NotLoad" in load_state:
+        coll.load()
+        utility.wait_for_loading_complete(collection, timeout=120)
+    elif "Loaded" not in load_state:
+        # Loading/recovering — wait
+        import time
+
+        for _ in range(20):
+            load_state = str(utility.load_state(collection))
+            if "Loaded" in load_state:
+                break
+            time.sleep(5)
+
+    # Use iterator to avoid offset+limit > 16384 cap
+    dates = set()
+    iterator = coll.query_iterator(
+        expr=f'modality == "{modality}"',
+        output_fields=["date_start"],
+        batch_size=10000,
+    )
     while True:
-        rows = coll.query(
-            expr=f'modality == "{modality}"',
-            output_fields=["date_start"],
-            limit=batch_size,
-            offset=offset,
-        )
+        rows = iterator.next()
+        if not rows:
+            break
         for r in rows:
             dates.add(r["date_start"])
-        if len(rows) < batch_size:
-            break
-        offset += batch_size
+    iterator.close()
     return dates
 
 
@@ -95,16 +119,11 @@ def fetch_milvus_dates(collection: str, modality: str, host: str, port: str) -> 
 # ---------------------------------------------------------------------------
 
 
-def date_to_num(date_str: str) -> float:
-    return datetime.strptime(date_str, "%Y-%m-%d").timestamp() / 86400.0  # days since epoch
+def date_to_num(date_str):
+    return datetime.strptime(date_str, "%Y-%m-%d").timestamp() / 86400.0
 
 
-def plot_timeline(
-    sensor_results: dict,  # sensor → {ee_dates, milvus_dates, color, modality}
-    output_path: str,
-    start_date: str,
-    end_date: str,
-):
+def plot_timeline(sensor_results, output_path, start_date, end_date):
     sensors = list(sensor_results.keys())
     n = len(sensors)
 
@@ -117,27 +136,27 @@ def plot_timeline(
 
     for ax, sensor in zip(axes, sensors, strict=False):
         info = sensor_results[sensor]
-        ee_dates = info["ee_dates"]
+        stac_dates = info["stac_dates"]
         milvus_dates = info["milvus_dates"]
         modality = info["modality"]
 
-        missing = sorted(ee_dates - milvus_dates)
-        done = sorted(ee_dates & milvus_dates)
+        missing = sorted(stac_dates - milvus_dates)
+        done = sorted(stac_dates & milvus_dates)
+        extra = sorted(milvus_dates - stac_dates)  # in Milvus but not in STAC query
 
-        # Draw tick marks: red=missing, green=done
         for d in missing:
-            x = date_to_num(d)
-            ax.axvline(x, color="red", alpha=0.6, linewidth=1.2)
+            ax.axvline(date_to_num(d), color="red", alpha=0.6, linewidth=1.2)
         for d in done:
-            x = date_to_num(d)
-            ax.axvline(x, color="green", alpha=0.7, linewidth=1.2)
+            ax.axvline(date_to_num(d), color="green", alpha=0.7, linewidth=1.2)
+        for d in extra:
+            ax.axvline(date_to_num(d), color="blue", alpha=0.4, linewidth=0.8)
 
-        # Summary text
-        total = len(ee_dates)
+        total = len(stac_dates)
         processed = len(done)
         pct = 100 * processed / total if total else 0
         ax.set_title(
-            f"{sensor}  ({modality})   {processed}/{total} processed  ({pct:.0f}%)",
+            f"{sensor}  ({modality})   {processed}/{total} processed  ({pct:.0f}%)"
+            f"   [{len(extra)} extra in Milvus]",
             loc="left",
             fontsize=11,
         )
@@ -146,37 +165,32 @@ def plot_timeline(
         ax.set_ylabel(sensor, fontsize=10, rotation=0, labelpad=50, va="center")
         ax.grid(axis="x", linestyle="--", alpha=0.3)
 
-    # X-axis: year ticks
+    # X-axis year ticks
     ax = axes[-1]
     start_year = int(start_date[:4])
     end_year = int(end_date[:4]) + 1
-    year_ticks = []
-    year_labels = []
-    for year in range(start_year, end_year + 1):
-        d = f"{year}-01-01"
-        year_ticks.append(date_to_num(d))
-        year_labels.append(str(year))
+    year_ticks = [date_to_num(f"{y}-01-01") for y in range(start_year, end_year + 1)]
+    year_labels = [str(y) for y in range(start_year, end_year + 1)]
     ax.set_xticks(year_ticks)
     ax.set_xticklabels(year_labels, fontsize=9)
     ax.set_xlabel("Date", fontsize=10)
 
     # Legend
-    green_patch = mpatches.Patch(color="green", alpha=0.7, label="Processed in Milvus")
-    red_patch = mpatches.Patch(color="red", alpha=0.6, label="Available in EE, not yet processed")
-    fig.legend(handles=[green_patch, red_patch], loc="upper right", fontsize=10)
-
-    fig.suptitle(
-        f"Timeline coverage  ({start_date} → {end_date})",
-        fontsize=13,
-        y=1.01,
+    fig.legend(
+        handles=[
+            mpatches.Patch(color="green", alpha=0.7, label="Processed (in STAC + Milvus)"),
+            mpatches.Patch(color="red", alpha=0.6, label="Missing (in STAC, not in Milvus)"),
+            mpatches.Patch(color="blue", alpha=0.4, label="Extra (in Milvus only)"),
+        ],
+        loc="upper right",
+        fontsize=10,
     )
+
+    fig.suptitle(f"Timeline coverage  ({start_date} -> {end_date})", fontsize=13, y=1.01)
     fig.tight_layout()
-
-    import os
-
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     fig.savefig(output_path, dpi=150, bbox_inches="tight")
-    print(f"✓ Timeline saved to {output_path}")
+    print(f"Saved to {output_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -194,36 +208,27 @@ def main():
     parser.add_argument("--milvus-port", default="19530")
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
     parser.add_argument(
-        "--skip-ee", action="store_true", help="Skip EE query (show only what is in Milvus)"
+        "--skip-stac", action="store_true", help="Skip STAC query (show only Milvus)"
     )
     args = parser.parse_args()
 
-    # Init EE
-    if not args.skip_ee:
-        try:
-            ee.Initialize()
-        except Exception:
-            ee.Authenticate()
-            ee.Initialize()
-
-        gdf = gpd.read_file(args.geojson)
-        bounds = gdf.total_bounds
-        roi_ee = ee.Geometry.BBox(bounds[0], bounds[1], bounds[2], bounds[3])
+    gdf = gpd.read_file(args.geojson)
+    bbox = list(gdf.total_bounds)
 
     sensor_results = {}
 
-    for sensor, cfg in EE_SENSORS.items():
+    for sensor, cfg in tqdm(SENSORS.items(), desc="Sensors"):
         print(f"\n[{sensor}]")
 
-        if args.skip_ee:
-            ee_dates = set()
-            print("  EE query skipped.")
+        if args.skip_stac:
+            stac_dates = set()
+            print("  STAC query skipped.")
         else:
-            print(f"  Fetching EE dates ({cfg['collection']})...")
-            ee_dates = fetch_ee_dates(cfg, roi_ee, args.start, args.end)
-            print(f"  EE dates: {len(ee_dates)}")
+            print(f"  Querying STAC ({cfg['stac_collection']})...")
+            stac_dates = fetch_stac_dates(cfg, bbox, args.start, args.end)
+            print(f"  STAC dates: {len(stac_dates)}")
 
-        print(f"  Fetching Milvus dates (modality={cfg['modality']})...")
+        print(f"  Querying Milvus (modality={cfg['modality']})...")
         milvus_dates = fetch_milvus_dates(
             args.collection,
             cfg["modality"],
@@ -232,12 +237,12 @@ def main():
         )
         print(f"  Milvus dates: {len(milvus_dates)}")
 
-        if ee_dates:
-            missing = ee_dates - milvus_dates
+        if stac_dates:
+            missing = stac_dates - milvus_dates
             print(f"  Missing: {len(missing)}")
 
         sensor_results[sensor] = {
-            "ee_dates": ee_dates,
+            "stac_dates": stac_dates,
             "milvus_dates": milvus_dates,
             "color": cfg["color"],
             "modality": cfg["modality"],
